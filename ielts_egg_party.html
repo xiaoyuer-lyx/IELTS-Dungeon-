@@ -355,8 +355,20 @@ var user=null,wOff=0,sStep=0,curShop='pets',curInv='pets',curScoreImg=null;
 var today=function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 var fmt=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 var uk=function(k){return 'u_'+user+'_'+k};
-var ld=function(k,d){try{var r=localStorage.getItem(uk(k));return r?JSON.parse(r):d}catch{return d}};
-var sd=function(k,v){localStorage.setItem(uk(k),JSON.stringify(v))};
+var _cache={};
+var _dirty={};
+var _saveTimer=null;
+// 本地读（首次从远端加载的数据写进本地缓存）
+var ld=function(k,d){try{if(k in _cache)return _cache[k];var r=localStorage.getItem(uk(k));return r?JSON.parse(r):d}catch{return d}};
+// 本地写 + 自动云同步（防抖 800ms，把整份用户数据推给后端）
+var sd=function(k,v){_cache[k]=v;_dirty[k]=1;try{localStorage.setItem(uk(k),JSON.stringify(v))}catch(e){}scheduleSave()};
+// 认证时从后端拉取整份数据到本地缓存
+var loadFromServer=function(d){_cache={};['st','si','set','pl','ck','sc','bio'].forEach(function(k){if(d&&d[k]!==undefined){_cache[k]=d[k];try{localStorage.setItem(uk(k),JSON.stringify(d[k]))}catch(e){}}});};
+// 防抖云保存：收集所有 _cache 字段推给后端
+function scheduleSave(){if(_saveTimer)clearTimeout(_saveTimer);_saveTimer=setTimeout(saveNow,800)}
+function saveNow(){if(!user||user==='admin'||!window._token){_saveTimer=null;return}if(!Object.keys(_dirty).length){_saveTimer=null;return}_saveTimer=null;_dirty={};
+  var payload={};['st','si','set','pl','ck','sc','bio'].forEach(function(k){if(k in _cache)payload[k]=_cache[k]});
+  fetch('/api/data',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({data:payload})}).catch(function(){})}
 var gU=function(){try{return JSON.parse(localStorage.getItem('_us')||'{}')}catch{return{}}};
 var sU=function(u){localStorage.setItem('_us',JSON.stringify(u))};
 var stats=function(){return ld('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]})};
@@ -385,13 +397,26 @@ var Q=[{t:'千里之行始于足下',a:'老子'},{t:'天道酬勤',a:'古训'},{
 // ===== 认证 =====
 function showAuth(t){$('formLogin').style.display=t==='login'?'block':'none';$('formReg').style.display=t==='register'?'block':'none';$('tabLogin').style.background=t==='login'?'#fff':'transparent';$('tabReg').style.background=t==='register'?'#fff':'transparent';$('loginErr').textContent='';$('regErr').textContent=''}
 function handleLogin(){var u=$('loginU').value.trim(),p=$('loginP').value;if(!u||!p){$('loginErr').textContent='请填写完整！';return}
-// 管理员内置账号
-var ADMIN_PW='admin123';
-if(u==='admin'){if(p!==ADMIN_PW){$('loginErr').textContent='管理员密码错误！';return}user='admin';localStorage.setItem('_cu','admin');enterApp();return}
-var us=gU();if(!us[u]){$('loginErr').textContent='用户不存在！';return}var d=us[u];var pw=typeof d==='string'?d:d.pw;if(pw!==p){$('loginErr').textContent='密码错误！';return}user=u;localStorage.setItem('_cu',u);enterApp()}
+$('loginErr').textContent='登录中…';$('loginErr').style.color='#7a7a9e';
+fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
+.then(function(r){return r.json()})
+.then(function(res){
+  if(!res.ok){$('loginErr').textContent=res.error||'登录失败！';$('loginErr').style.color='#e74c3c';return}
+  window._token=res.token;localStorage.setItem('_tk',res.token);user=u;localStorage.setItem('_cu',u);
+  window._email=res.email||'';window._nick=res.nickname||'';
+  if(res.data)loadFromServer(res.data);
+  enterApp();
+}).catch(function(){$('loginErr').textContent='网络错误，请稍后再试';$('loginErr').style.color='#e74c3c'})}
 function isAdmin(){return user==='admin'}
-function handleRegister(){var e=$('regE').value.trim(),u=$('regU').value.trim(),p=$('regP').value,c=$('regC').value;if(!e||!/^\S+@\S+\.\S+$/.test(e)){$('regErr').textContent='邮箱无效！';return}if(u.length<3){$('regErr').textContent='至少3字符！';return}if(p.length<6){$('regErr').textContent='至少6字符！';return}if(p!==c){$('regErr').textContent='两次不一致！';return}var us=gU();if(us[u]){$('regErr').textContent='已存在！';return}us[u]={pw:p,email:e};sU(us);var o=user;user=u;sd('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]});sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('set',null);sd('pl',null);sd('ck',{});user=o;$('loginU').value=u;$('loginP').value='';$('loginErr').textContent='✅ 注册成功，请登录！';$('loginErr').style.color='#84fab0';showAuth('login')}
-function logout(){user=null;localStorage.removeItem('_cu');$('appScreen').style.display='none';$('authScreen').style.display='flex'}
+function handleRegister(){var e=$('regE').value.trim(),u=$('regU').value.trim(),p=$('regP').value,c=$('regC').value;if(!e||!/^\S+@\S+\.\S+$/.test(e)){$('regErr').textContent='邮箱无效！';return}if(u.length<3){$('regErr').textContent='至少3字符！';return}if(p.length<6){$('regErr').textContent='至少6位！';return}if(p!==c){$('regErr').textContent='两次不一致！';return}
+$('regErr').textContent='注册中…';$('regErr').style.color='#7a7a9e';
+fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,email:e})})
+.then(function(r){return r.json()})
+.then(function(res){
+  if(!res.ok){$('regErr').textContent=res.error||'注册失败！';$('regErr').style.color='#e74c3c';return}
+  $('loginU').value=u;$('loginP').value='';$('loginErr').textContent='✅ 注册成功，请登录！';$('loginErr').style.color='#84fab0';showAuth('login')
+}).catch(function(){$('regErr').textContent='网络错误，请稍后再试';$('regErr').style.color='#e74c3c'})}
+function logout(){if(window._saveTimer){clearTimeout(window._saveTimer);saveNow()}user=null;window._token=null;localStorage.removeItem('_cu');localStorage.removeItem('_tk');$('appScreen').style.display='none';$('authScreen').style.display='flex'}
 function sisiMsg(){alert(['思思说加油！','冲冲冲！','思思相信你！'][Math.floor(Math.random()*3)])}
 var _dropTimer=null;
 function toggleDrop(){hideNotifyDrop();var el=$('userDrop');if(el.style.display==='block'){el.style.display='none'}else{el.style.display='block'}}
@@ -559,13 +584,13 @@ function confirmPlanWizard(){$('planConfirmOv').style.display='none';sd('pl',nul
 function closePlanConfirm(){$('planConfirmOv').style.display='none'}
 function openSettings(){fillSettings();$('settingsOv').style.display='flex'}
 function closeSettings(){$('settingsOv').style.display='none'}
-function fillSettings(){var set=ld('set',null);var us=gU();var ud=user?us[user]:null;
+function fillSettings(){var set=ld('set',null);var d=ld('bio','')&&_cache.bio!==undefined?ld('bio',''):'';var nick=(window._nick||'');var email=(window._email||'');
 $('setUser').textContent=user||'-';
 $('setUser2').textContent=user||'-';
-$('setEmail').textContent=(ud&&ud.email)?ud.email:'-';
-$('setEmail2').textContent=(ud&&ud.email)?ud.email:'-';
-$('setNick').textContent=user||'-';
-$('setNick2').textContent=user||'-';
+$('setEmail').textContent=email||'-';
+$('setEmail2').textContent=email||'-';
+$('setNick').textContent=nick||user||'-';
+$('setNick2').textContent=nick||user||'-';
 if(set){$('setTarget').textContent=set.target||'-';$('setExam').textContent=set.exam||'-';$('setCet').textContent=set.cet||'-'}
 else{$('setTarget').textContent='-';$('setExam').textContent='-';$('setCet').textContent='-'}
 $('setTarget2').textContent=$('setTarget').textContent;
@@ -573,37 +598,50 @@ $('setExam2').textContent=$('setExam').textContent;
 $('setCet2').textContent=$('setCet').textContent;
 // 弹窗内的制定新计划按钮也跟随主题
 var p3=$('planBtn3');if(p3&&window._lastAccentDark)p3.style.color=window._lastAccentDark;}
-function editSetting(field){var val=prompt('请输入新的'+field+':','');if(val===null)return;val=val.trim();if(!val){alert('不能为空！');return}
-var set=ld('set',null);var us=gU();var ud=user?us[user]:null;
-if(field==='用户名'){if(us[val]){alert('用户名已存在！');return}var ud2=ud;delete us[user];us[val]=ud2;sU(us);localStorage.removeItem('_cu');localStorage.setItem('_cu',val);user=val;fillSettings();upBar();alert('✅ 用户名已更新')}
-else if(field==='邮箱'){if(!/^\S+@\S+\.\S+$/.test(val)){alert('邮箱格式无效！');return}ud.email=val;us[user]=ud;sU(us);fillSettings();alert('✅ 邮箱已更新')}
-else if(field==='昵称'){if(!ud)ud={};ud.nick=val;us[user]=ud;sU(us);fillSettings();alert('✅ 昵称已更新')}
-else if(field==='密码'){if(val.length<6){alert('密码至少6位！');return}ud.pw=val;us[user]=ud;sU(us);alert('✅ 密码已更新')}
+function editSetting(field){if(field==='用户名'){alert('用户名不可修改');return}var val=prompt('请输入新的'+field+':','');if(val===null)return;val=val.trim();if(!val){alert('不能为空！');return}
+var set=ld('set',null);
+if(field==='邮箱'){if(!/^\S+@\S+\.\S+$/.test(val)){alert('邮箱格式无效！');return}
+  fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({email:val})}).then(function(r){return r.json()}).then(function(res){if(res.ok){window._email=val;fillSettings();alert('✅ 邮箱已更新')}else alert(res.error||'保存失败')})}
+else if(field==='昵称'){if(val.length>20){alert('昵称最多20字符');return}
+  fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({nickname:val})}).then(function(r){return r.json()}).then(function(res){if(res.ok){window._nick=val;fillSettings();alert('✅ 昵称已更新')}else alert(res.error||'保存失败')})}
+else if(field==='密码'){if(val.length<6){alert('密码至少6位！');return}
+  fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({password:val})}).then(function(r){return r.json()}).then(function(res){if(res.ok){alert('✅ 密码已更新')}else alert(res.error||'保存失败')})}
 else if(field==='目标总分'){if(set){set.target=parseFloat(val);sd('set',set)}fillSettings();alert('✅ 目标总分已更新')}
 else if(field==='考试日期'){if(set){set.exam=val;sd('set',set)}fillSettings();alert('✅ 考试日期已更新')}
 else if(field==='六级分数'){if(set){set.cet=parseInt(val);sd('set',set)}fillSettings();alert('✅ 六级分数已更新')}}
 function regeneratePlan(){if(confirm('重新生成将按当前设置重新计算计划，打卡记录会保留，确定？')){var set=ld('set',null);if(!set){alert('请先完成设置向导！');return}var plan=null;window._genTemp=set;genPlanFromSettings(set);alert('✅ 计划已重新生成！')}}
 function genPlanFromSettings(set){sd('pl',null);var start=new Date();start.setHours(0,0,0,0);var eDate=new Date(set.exam);var diff=Math.ceil((eDate-start)/86400000);if(diff<=0){alert('日期无效');return}var N=set.total||60,sch=set.sched||{};var dw=[];var tw=0;for(var d=0;d<diff;d++){var dt=new Date(start);dt.setDate(dt.getDate()+d);var en=DAYE[dt.getDay()],sc=sch[en]||'none';var w=0;if(sc==='full')w=4;else if(sc==='m_a')w=3.5;else if(sc==='a_e')w=3;else if(sc==='morning'||sc==='afternoon'||sc==='evening')w=2;else if(sc==='lite')w=1;else w=.3;dw.push({date:fmt(dt),weight:w,sched:sc});tw+=w}var ta=[];if(tw>0){var as=dw.map(function(d){return Math.floor(d.weight/tw*N)});var rm=N-as.reduce(function(a,b){return a+b},0);var idx=dw.map(function(d,i){return{i:i,w:d.weight}}).sort(function(a,b){return b.w-a.w});for(var i=0;i<rm&&i<idx.length;i++)as[idx[i].i]++;ta=as}else dw.forEach(function(){ta.push(0)});var tc=0;var days=[];for(var d=0;d<diff;d++){var _dw=dw[d],nt=ta[d]||0,tasks=[],date=_dw.date;for(var t=0;t<nt&&tc<N;t++){var l=TS[tc%TS.length];tasks.push({id:'t'+date+'_'+tc,l:'📝刷'+l+'第'+(tc+1)+'套',ex:20,co:8,sub:'L'});tc++;tasks.push({id:'la'+date+'_'+t,l:'🔍精析听力错题',ex:10,co:4,sub:'L'});tasks.push({id:'ra'+date+'_'+t,l:'🔍精析阅读错题',ex:10,co:4,sub:'R'})}var isH=_dw.sched==='full'||_dw.sched==='m_a'||_dw.sched==='a_e',isL=_dw.sched==='morning'||_dw.sched==='afternoon'||_dw.sched==='evening';if(isH&&d%3===1)tasks.push({id:'w1'+date,l:'✍️小作文',ex:12,co:5,sub:'W'});if(isH&&d%3===2)tasks.push({id:'w2'+date,l:'✍️大作文',ex:15,co:6,sub:'W'});if((isH||isL)&&d%2===0)tasks.push({id:'sp'+date,l:'🎤口语练习',ex:12,co:5,sub:'S'});if(d%2===0)tasks.push({id:'vo'+date,l:'📖词汇背诵',ex:8,co:3,sub:'L'});if(d%4===0)tasks.push({id:'rv'+date,l:'📓错题本复习',ex:8,co:3,sub:'R'});if(!tasks.length)tasks.push({id:'li'+date,l:'📚复习笔记',ex:6,co:2,sub:'R'});days.push({date,tasks})}sd('pl',{d:days,total:N})}
 function resetAccount(){if(confirm('确定要重置账号数据吗？将清空所有打卡记录和进度！')){var keep={lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]};sStats(keep);sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('ck',{});sd('sc',[]);sd('bio','');sd('set',null);sd('pl',null);alert('✅ 账号已重置！');$('appScreen').style.display='none';$('setupScreen').style.display='flex';setupInit()}}
-function deleteAccount(){if(confirm('⚠️ 确定要永久删除账号吗？此操作不可恢复！')){if(!confirm('再次确认：删除后将无法找回任何数据！'))return;var us=gU();delete us[user];sU(us);localStorage.removeItem('_cu');Object.keys(localStorage).forEach(function(k){if(k.indexOf('u_'+user+'_')===0)localStorage.removeItem(k)});user=null;location.reload()}}
+function deleteAccount(){if(confirm('⚠️ 确定要永久删除账号吗？此操作不可恢复！')){if(!confirm('再次确认：删除后将无法找回任何数据！'))return;
+fetch('/api/account',{method:'DELETE',headers:{'Authorization':'Bearer '+(window._token||'')}}).then(function(r){return r.json()}).then(function(res){if(res.ok){user=null;window._token=null;localStorage.removeItem('_cu');localStorage.removeItem('_tk');location.reload()}else alert(res.error||'删除失败')})}}
 // ===== 管理后台 =====
-function adminUsers(){var us=gU();return Object.keys(us).filter(function(k){return k!=='admin'})}
-function renderAdminUsers(){var us=gU();var names=adminUsers();var box=$('adminUsers');if(!names.length){box.innerHTML='<p style="color:#7a7a9e">暂无注册用户</p>';return}
-box.innerHTML='<div style="display:grid;gap:8px">'+names.map(function(n){
-  var d=us[n]||{};var st=ld('st',{lv:1,co:0});var email=d.email||'-';
-  return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.7);border-radius:14px;flex-wrap:wrap">'
-   +'<span style="font-weight:700">👤 '+n+'</span>'
-   +'<span style="font-size:.75rem;color:#7a7a9e">📧 '+email+'</span>'
-   +'<span style="font-size:.75rem;color:#7a7a9e">Lv.'+st.lv+' · 🪙'+Math.max(0,st.co)+'</span>'
-   +'<span style="font-size:.75rem;color:#7a7a9e">✔ '+((st.tk||0))+'任务</span>'
-   +'<span style="margin-left:auto;display:flex;gap:6px">'
-   +'<button class="btn btn-sm" style="background:rgba(161,140,209,.15);color:#a18cd1;padding:3px 10px;font-size:.7rem" onclick="adminGiveCoins(\''+n+'\')">🪙 加金币</button>'
-   +'<button class="btn btn-sm" style="background:rgba(132,250,176,.3);color:#2d8f5c;padding:3px 10px;font-size:.7rem" onclick="adminResetUser(\''+n+'\')">🔄 重置</button>'
-   +'<button class="btn btn-sm" style="background:rgba(255,107,107,.2);color:#e74c3c;padding:3px 10px;font-size:.7rem" onclick="adminDeleteUser(\''+n+'\')">🗑️ 删除</button>'
-   +'</span></div>'}).join('')+'</div>'}
-function adminGiveCoins(n){var amt=prompt('给 '+n+' 加多少金币？','500');if(amt===null)return;amt=parseInt(amt);if(isNaN(amt))return;var o=user;user=n;var st=stats();st.co+=amt;sStats(st);user=o;alert('✅ 已给 '+n+' 加 '+amt+' 金币');renderAdminUsers()}
-function adminResetUser(n){if(!confirm('重置 '+n+' 的数据？'))return;var o=user;user=n;sd('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]});sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('ck',{});sd('sc',[]);sd('bio','');sd('set',null);sd('pl',null);user=o;alert('✅ 已重置 '+n);renderAdminUsers()}
-function adminDeleteUser(n){if(!confirm('删除账号 '+n+'？此操作不可恢复！'))return;var us=gU();delete us[n];sU(us);Object.keys(localStorage).forEach(function(k){if(k.indexOf('u_'+n+'_')===0)localStorage.removeItem(k)});alert('🗑️ 已删除 '+n);renderAdminUsers()}
+function renderAdminUsers(){var box=$('adminUsers');box.innerHTML='<p style="color:#7a7a9e">加载中…</p>';
+fetch('/api/admin/users',{headers:{'Authorization':'Bearer '+(window._token||'')}})
+.then(function(r){return r.json()})
+.then(function(res){var names=(res.users||[]).map(function(u){return u.username});
+  if(!names.length){box.innerHTML='<p style="color:#7a7a9e">暂无注册用户</p>';return}
+  box.innerHTML='<div style="display:grid;gap:8px">'+names.map(function(n){
+    var d=res.users.find(function(u){return u.username===n})||{};var st=d.st||{lv:1,co:0};var email=d.email||'-';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.7);border-radius:14px;flex-wrap:wrap">'
+     +'<span style="font-weight:700">👤 '+n+'</span>'
+     +'<span style="font-size:.75rem;color:#7a7a9e">📧 '+email+'</span>'
+     +'<span style="font-size:.75rem;color:#7a7a9e">Lv.'+st.lv+' · 🪙'+Math.max(0,st.co)+'</span>'
+     +'<span style="font-size:.75rem;color:#7a7a9e">✔ '+((st.tk||0))+'任务</span>'
+     +'<span style="margin-left:auto;display:flex;gap:6px">'
+     +'<button class="btn btn-sm" style="background:rgba(161,140,209,.15);color:#a18cd1;padding:3px 10px;font-size:.7rem" onclick="adminGiveCoins(\''+n+'\')">🪙 加金币</button>'
+     +'<button class="btn btn-sm" style="background:rgba(132,250,176,.3);color:#2d8f5c;padding:3px 10px;font-size:.7rem" onclick="adminResetUser(\''+n+'\')">🔄 重置</button>'
+     +'<button class="btn btn-sm" style="background:rgba(255,107,107,.2);color:#e74c3c;padding:3px 10px;font-size:.7rem" onclick="adminDeleteUser(\''+n+'\')">🗑️ 删除</button>'
+     +'</span></div>'}).join('')+'</div>'
+}).catch(function(){box.innerHTML='<p style="color:#e74c3c">加载失败</p>'})}
+function adminGiveCoins(n){var amt=prompt('给 '+n+' 加多少金币？','500');if(amt===null)return;amt=parseInt(amt);if(isNaN(amt))return;
+fetch('/api/admin/users/'+n+'/coins',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({amount:amt})})
+.then(function(r){return r.json()}).then(function(res){if(res.ok){alert('✅ 已给 '+n+' 加 '+amt+' 金币');renderAdminUsers()}})}
+function adminResetUser(n){if(!confirm('重置 '+n+' 的数据？'))return;
+fetch('/api/admin/users/'+n+'/reset',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')}})
+.then(function(r){return r.json()}).then(function(res){if(res.ok){alert('✅ 已重置 '+n);renderAdminUsers()}})}
+function adminDeleteUser(n){if(!confirm('删除账号 '+n+'？此操作不可恢复！'))return;
+fetch('/api/admin/users/'+n,{method:'DELETE',headers:{'Authorization':'Bearer '+(window._token||'')}})
+.then(function(r){return r.json()}).then(function(res){if(res.ok){alert('🗑️ 已删除 '+n);renderAdminUsers()}})}
 function showAdminNav(){var b=$('adminNavBtn');if(b)b.style.display=isAdmin()?'':'none'}
 // 管理员无限金币：显示99999+
 function adminCoins(){if(isAdmin())return 99999;var s=stats();return Math.max(0,s.co)}
@@ -614,7 +652,7 @@ function toggleNotifyDrop(){hideDrop();var el=$('notifyDrop');if(el.style.displa
 function hideNotifyDrop(){var el=$('notifyDrop');if(el)el.style.display='none'}
 function buildNotify(){var items=[];var s=stats();if((s.ah||[]).length>0)items.push('🏆 恭喜解锁 '+s.ah.length+' 个成就！');var set=ld('set',null);if(set){var d=Math.ceil((new Date(set.exam)-new Date())/86400000);if(d>0)items.push('⏳ 距离雅思考试还有 '+d+' 天');if(d===0)items.push('📢 今天就是考试日！加油！')}var rec=ld('sc',[]);if(rec.length)items.push('📊 你已上传 '+rec.length+' 次成绩');if(items.length===0)items.push('✨ 暂无新通知');return items.map(function(t){return '<div style="padding:10px;background:rgba(255,255,255,.6);border-radius:12px;margin-bottom:6px;font-size:.85rem">'+t+'</div>'}).join('')}
 // ===== 数据同步 =====
-function doSync(){var n=new Date();localStorage.setItem('_last_sync_'+user,n.getTime());renderNotifyDot();upBar();upAvatar();upTasks();upDash();upAch();showSyncToast()}
+function doSync(){saveNow();renderNotifyDot();upBar();upAvatar();upTasks();upDash();upAch();showSyncToast()}
 var _syncToast=null;
 function showSyncToast(){if(_syncToast){_syncToast.remove()}_syncToast=document.createElement('div');_syncToast.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(61,61,92,.9);color:#fff;padding:8px 20px;border-radius:50px;font-size:.8rem;z-index:99999;font-family:"Baloo 2",cursive;box-shadow:0 4px 15px rgba(0,0,0,.15);animation:pop .3s ease';_syncToast.textContent='✅ 已保存并刷新';document.body.appendChild(_syncToast);setTimeout(function(){if(_syncToast){_syncToast.remove();_syncToast=null}},1500)}
 function renderNotifyDot(){var s=stats();var hasNew=(s.ah||[]).length>0;var dot=$('notifyDot');if(dot)dot.style.display=hasNew?'block':'none'}
@@ -638,6 +676,6 @@ document.addEventListener('click',function(e){
   var ud=$('userDrop');if(ud&&ud.style.display==='block'&&!e.target.closest('#userDrop')&&!e.target.closest('[onclick="toggleDrop()"]')){ud.style.display='none'}
   var nd=$('notifyDrop');if(nd&&nd.style.display==='block'&&!e.target.closest('#notifyDrop')&&!e.target.closest('[onclick="toggleNotifyDrop()"]')){nd.style.display='none'}
 });
-(function init(){var cu=localStorage.getItem('_cu');if(cu){var us=gU();if(us[cu]){user=cu;enterApp()}}})();
+(function init(){var cu=localStorage.getItem('_cu');if(cu){var us=gU();if(us[cu]||localStorage.getItem('_tk')){user=cu;window._token=localStorage.getItem('_tk')||'';fetch('/api/data',{headers:{'Authorization':'Bearer '+window._token}}).then(function(r){return r.json()}).then(function(res){if(res.data){loadFromServer(res.data);window._email=res.email||'';window._nick=res.nickname||''}else{user=null;localStorage.removeItem('_cu');localStorage.removeItem('_tk')}if(user)enterApp()}).catch(function(){if(user)enterApp()})}else{window._token=''}}})();
 </script>
 </body></html>

@@ -100,7 +100,8 @@ app.post('/api/login', async (req, res) => {
     const ok = await bcrypt.compare(password, user.password);
     if (!ok) return res.status(401).json({ error: '密码错误' });
 
-    res.json({ ok: true, token: makeToken(username), data: user.data || {} });
+    const ud = user.data || {};
+    res.json({ ok: true, token: makeToken(username), email: user.email, nickname: ud.nick || null, data: ud });
   } catch (e) {
     console.error('login error:', e);
     res.status(500).json({ error: '登录失败' });
@@ -110,9 +111,10 @@ app.post('/api/login', async (req, res) => {
 // 读取当前用户数据
 app.get('/api/data', auth, async (req, res) => {
   try {
-    const { data } = await supabase.from('users').select('data').eq('username', req.user).maybeSingle();
-    if (!data) return res.status(404).json({ error: '用户不存在' });
-    res.json({ data: data.data || {} });
+    const { data: user } = await supabase.from('users').select('*').eq('username', req.user).maybeSingle();
+    if (!user) return res.status(404).json({ error: '用户不存在' });
+    const ud = user.data || {};
+    res.json({ data: ud, email: user.email, nickname: ud.nick || null });
   } catch (e) {
     console.error('get data error:', e);
     res.status(500).json({ error: '读取失败' });
@@ -129,6 +131,51 @@ app.post('/api/data', auth, async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     console.error('save data error:', e);
+    res.status(500).json({ error: '保存失败' });
+  }
+});
+
+// 删除当前用户账号
+app.delete('/api/account', auth, async (req, res) => {
+  try {
+    if (req.user === 'admin') return res.status(400).json({ error: '管理员账号不可删除' });
+    const { error } = await supabase.from('users').delete().eq('username', req.user);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('delete account error:', e);
+    res.status(500).json({ error: '删除失败' });
+  }
+});
+
+// 更新账户设置：邮箱/昵称/密码
+app.put('/api/settings', auth, async (req, res) => {
+  try {
+    const { email, nickname, password } = req.body;
+    const { data: user } = await supabase.from('users').select('data').eq('username', req.user).maybeSingle();
+    if (!user) return res.status(404).json({ error: '用户不存在' });
+
+    const updates = {};
+    if (email !== undefined) {
+      if (!/^\S+@\S+\.\S+$/.test(email)) return res.status(400).json({ error: '邮箱格式无效' });
+      updates.email = email;
+    }
+    if (nickname !== undefined) {
+      if (!nickname || String(nickname).length > 20) return res.status(400).json({ error: '昵称需 1-20 字符' });
+      const d = user.data || {};
+      d.nick = nickname;
+      updates.data = d;
+    }
+    if (password !== undefined) {
+      if (String(password).length < 6) return res.status(400).json({ error: '密码至少6位' });
+      updates.password = bcrypt.hashSync(password, 10);
+    }
+
+    const { error } = await supabase.from('users').update(updates).eq('username', req.user);
+    if (error) throw error;
+    res.json({ ok: true });
+  } catch (e) {
+    console.error('update settings error:', e);
     res.status(500).json({ error: '保存失败' });
   }
 });
