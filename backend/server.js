@@ -209,6 +209,11 @@ const path = require('path');
 const frontendDir = path.join(__dirname, '..');
 app.use(express.static(frontendDir));
 
+// 根路径 -> 打开前端主页
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendDir, 'ielts_egg_party.html'));
+});
+
 // 健康检查
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 
