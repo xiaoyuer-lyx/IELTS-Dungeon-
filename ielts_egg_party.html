@@ -1,0 +1,643 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>⚔️ 雅思副本 · IELTS Dungeon</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Quicksand','Nunito',sans-serif;background:linear-gradient(135deg,#e8d5f5,#d5e8f7 50%,#e8f5e0 100%);min-height:100vh;color:#3d3d5c;overflow-x:hidden}
+h1,h2,h3{font-family:'Baloo 2','Quicksand',cursive}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 24px;border:none;border-radius:50px;font-family:'Baloo 2',cursive;font-weight:700;font-size:.9rem;cursor:pointer;transition:all .3s;box-shadow:0 4px 15px rgba(0,0,0,.1)}
+.btn-pri{background:linear-gradient(135deg,#f6d365,#fda085);color:#3d3d5c}
+.btn-sec{background:linear-gradient(135deg,#a18cd1,#fbc2eb);color:#fff}
+.btn-suc{background:linear-gradient(135deg,#84fab0,#8fd3f4);color:#3d3d5c}
+.btn-gacha{background:linear-gradient(135deg,#ffd700,#ff6b6b);color:#fff}
+.card{background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-radius:24px;padding:20px;box-shadow:0 8px 32px rgba(161,140,209,.15);border:1px solid rgba(255,255,255,.5)}
+.ig{display:flex;flex-direction:column;gap:4px;margin-bottom:14px;text-align:left}
+.ig label{font-weight:600;font-size:.9rem}
+.ig input,.ig select{padding:12px 14px;border:2px solid #e8e0f0;border-radius:14px;font-size:.95rem;outline:none;font-family:'Quicksand',sans-serif;width:100%}
+.ig input:focus,.ig select:focus{border-color:#a18cd1;box-shadow:0 0 0 3px rgba(161,140,209,.2)}
+.err{color:#e74c3c;font-size:.85rem;min-height:1.4em}.hidden{display:none!important}
+@keyframes slide{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fall{0%{transform:translateY(-10vh)rotate(0);opacity:1}100%{transform:translateY(100vh)rotate(720deg);opacity:0}}@keyframes pop{0%{transform:scale(0);opacity:0}70%{transform:scale(1.15)}100%{transform:scale(1);opacity:1}}
+.grid2{display:grid;grid-template-columns:1fr 460px;gap:20px;align-items:start}@media(max-width:900px){.grid2{grid-template-columns:1fr}}
+.tc{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;background:rgba(255,255,255,.85);border-radius:16px;border:2px solid transparent;margin-bottom:8px;transition:opacity .3s,transform .3s}
+.tc.ok{opacity:.5}.tc.ok .tspan{text-decoration:line-through;color:#7a7a9e}
+.chk{width:26px;height:26px;border-radius:50%;border:3px solid #a18cd1;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.85rem;margin-top:2px}
+.chk.on{background:linear-gradient(135deg,#84fab0,#8fd3f4);border-color:#84fab0}
+.tspan{font-weight:600;font-size:.9rem;flex:1}
+.page{display:block}.page.hide{display:none}
+.page.show{animation:fadeIn .35s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.tc.done-anim .tspan{position:relative}
+.tc.done-anim .tspan::after{content:'';position:absolute;left:0;top:50%;height:2px;width:0;background:#7a7a9e;animation:strike .5s ease forwards}
+@keyframes strike{to{width:100%}}
+.tc.done-anim{background:#f0fbe8;opacity:.7}
+.topnav{background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:6px 12px;display:flex;align-items:center;position:relative;z-index:300;box-shadow:0 1px 0 rgba(161,140,209,.08),0 6px 20px -8px rgba(161,140,209,.25)}
+.topnav button{background:transparent;border:none;padding:8px 14px;font-family:'Baloo 2',cursive;font-weight:600;font-size:.95rem;color:#8a8aa8;cursor:pointer;border-radius:6px 6px 0 0;display:flex;align-items:center;gap:6px;transition:all .3s;position:relative;flex:0 1 auto}
+.topnav button:hover{color:#3d3d5c;background:rgba(255,255,255,.5)}
+.topnav button.active{color:#3d3d5c;font-weight:700;background:#fff;box-shadow:0 -2px 8px rgba(161,140,209,.12)}
+.topnav button.active::after{content:'';position:absolute;bottom:-2px;left:0;right:0;height:3px;border-radius:3px;background:var(--acc,#a18cd1);box-shadow:0 0 8px rgba(0,0,0,.12)}
+.r-tab{flex:1;padding:12px 4px;border:none;background:transparent;font-family:'Baloo 2',cursive;font-weight:600;font-size:.95rem;color:#7a7a9e;cursor:pointer;transition:all .3s;border-radius:12px}
+.r-tab.active{background:#fff;color:#3d3d5c;font-weight:700;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.ud{display:none;position:absolute;top:48px;right:0;background:#fff;border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.12);padding:8px 0;z-index:999;min-width:170px}
+.ud div{padding:10px 18px;font-size:.9rem;cursor:pointer}
+.ud div:hover{background:#f5f0ff}
+.shop-grid,.inv-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+@media(max-width:600px){.shop-grid,.inv-grid{grid-template-columns:repeat(3,1fr)}}
+.shop-item{background:rgba(255,255,255,.85);border-radius:16px;padding:12px 6px;text-align:center;cursor:pointer;border:2px solid transparent;transition:all .3s}
+.shop-item:hover{border-color:#a18cd1;transform:translateY(-2px)}
+.shop-item.owned{border-color:#84fab0;opacity:.7;cursor:default}
+.shop-item .ic{font-size:2.2rem;display:block}
+.sn{font-weight:700;font-size:.85rem}
+.shop-badge{display:inline-block;font-size:.7rem;padding:3px 10px;border-radius:50px;background:#f6d365;margin-top:5px;font-weight:600}
+.tab-bar{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap}
+.tab-bar button{padding:6px 16px;border:none;border-radius:50px;background:rgba(255,255,255,.4);font-family:'Baloo 2',cursive;font-weight:700;font-size:.8rem;color:#7a7a9e;cursor:pointer}
+.tab-bar button.active{background:#fff;color:#3d3d5c}
+.set-row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f0e8f8;font-size:.9rem}
+.set-row:last-child{border-bottom:none}
+.set-row span:first-child{flex:1;font-weight:600}
+.set-row span:nth-child(2){color:#7a7a9e;flex:2;font-size:.8rem}
+</style></head><body>
+
+<div id="authScreen" style="position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#d5c6f0,#b5e3fa 30%,#fbc2eb 70%,#ffe0b2)">
+  <div style="width:90%;max-width:400px;background:rgba(255,255,255,.25);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:40px;padding:36px 28px;border:1px solid rgba(255,255,255,.4);text-align:center;animation:slide .6s ease">
+    <div style="font-size:3.5rem;margin-bottom:4px;">⚔️</div>
+    <h1 style="font-size:1.8rem;background:linear-gradient(135deg,#a18cd1,#fda085);-webkit-background-clip:text">雅思副本</h1>
+    <p style="font-size:.85rem;color:#7a7a9e;margin:4px 0 20px;">IELTS Dungeon · 和思思一起攻克雅思</p>
+    <div style="display:flex;background:rgba(255,255,255,.25);border-radius:50px;padding:4px;margin-bottom:20px">
+      <button id="tabLogin" class="btn" style="flex:1;padding:8px;background:#fff;font-size:.9rem" onclick="showAuth('login')">登录</button>
+      <button id="tabReg" class="btn" style="flex:1;padding:8px;background:transparent;box-shadow:none;color:#7a7a9e;font-size:.9rem" onclick="showAuth('register')">注册</button>
+    </div>
+    <div id="formLogin">
+      <div class="ig"><label>👤 用户名</label><input type="text" id="loginU" placeholder="输入用户名"></div>
+      <div class="ig"><label>🔒 密码</label><input type="password" id="loginP" placeholder="输入密码"></div>
+      <div class="err" id="loginErr"></div>
+      <button class="btn btn-pri" style="width:100%;margin-top:8px" onclick="handleLogin()">🚀 登录</button>
+    </div>
+    <div id="formReg" style="display:none">
+      <div class="ig"><label>📧 邮箱</label><input type="email" id="regE" placeholder="输入邮箱"></div>
+      <div class="ig"><label>👤 用户名</label><input type="text" id="regU" placeholder="至少3个字符"></div>
+      <div class="ig"><label>🔒 密码</label><input type="password" id="regP" placeholder="至少6个字符"></div>
+      <div class="ig"><label>🔒 确认密码</label><input type="password" id="regC" placeholder="再次输入"></div>
+      <div class="err" id="regErr"></div>
+      <button class="btn btn-suc" style="width:100%;margin-top:8px" onclick="handleRegister()">🎉 注册</button>
+    </div>
+  </div>
+</div>
+
+<div id="setupScreen" style="display:none;position:fixed;inset:0;z-index:999;background:linear-gradient(135deg,#d5c6f0,#b5e3fa 50%,#fbc2eb);overflow-y:auto;padding:20px;">
+  <div style="width:100%;max-width:600px;background:rgba(255,255,255,.25);backdrop-filter:blur(20px);border-radius:40px;padding:32px;margin:20px auto">
+    <h2 style="text-align:center;margin-bottom:24px;">📋 副本设置向导</h2>
+    <div id="step0"><h3>📅 考试信息</h3>
+      <div class="ig"><label>考试日期</label><input type="date" id="sExam" value="2026-06-14"></div>
+      <div class="ig"><label>目标总分</label><input type="number" id="sTarget" value="7.0" min="5.5" max="9" step="0.5" placeholder="5.5~9.0"></div>
+      <div class="ig"><label>六级分数</label><input type="number" id="sCet" placeholder="如 539" value="539"></div>
+    </div>
+    <div id="step1" style="display:none"><h3>🎯 各科目标</h3>
+      <div class="ig"><label>👂 听力</label><input type="number" id="sL" value="7.0" min="5.5" max="9" step=".5"></div>
+      <div class="ig"><label>📖 阅读</label><input type="number" id="sR" value="7.0" min="5.5" max="9" step=".5"></div>
+      <div class="ig"><label>✍️ 写作</label><input type="number" id="sW" value="6.5" min="5.5" max="9" step=".5"></div>
+      <div class="ig"><label>🎤 口语</label><input type="number" id="sS" value="6.5" min="5.5" max="9" step=".5"></div>
+    </div>
+    <div id="step2" style="display:none"><h3>🔄 薄弱科目</h3><p style="font-size:.85rem;color:#7a7a9e;margin-bottom:10px;">拖拽或用▲▼排序</p><div id="weakList"></div></div>
+    <div id="step3" style="display:none"><h3>📚 刷题计划</h3>
+      <div class="ig"><label>真题套数</label><input type="number" id="sTests" value="60"></div>
+      <div class="ig"><label>基础</label><select id="sBase"><option value="b1">四级以下</option><option value="b2" selected>四级425-500</option><option value="b3">六级425-500</option><option value="b4">六级500+</option><option value="b5">六级550+</option><option value="b6">六级600+</option></select></div>
+    </div>
+    <div id="step4" style="display:none"><h3>🗓️ 空闲时间</h3><p style="font-size:.85rem;color:#7a7a9e;margin-bottom:10px;">勾选日期，选择时间段</p><div id="schedC"></div></div>
+    <div style="display:flex;justify-content:space-between;margin-top:24px;gap:12px">
+      <button class="btn btn-sec" id="sprev" onclick="sPrev()">⬅ 上一步</button>
+      <span id="sNum" style="color:#7a7a9e;font-size:.85rem">1/5</span>
+      <button class="btn btn-pri" id="snext" onclick="sNext()">下一步 ➡</button>
+      <button class="btn btn-suc hidden" id="sgen" onclick="genPlan()">⚔️ 生成计划</button>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen" style="display:none;flex-direction:column;min-height:100vh;background:linear-gradient(135deg,#e8d5f5,#d5e8f7 50%,#e8f5e0 100%)">
+  <div class="topnav">
+    <button class="active" onclick="goPage('tasks',this)">📋 任务</button>
+    <button onclick="goPage('inventory',this)">🗃️ 仓库</button>
+    <button onclick="goPage('shop',this)">🏪 商店</button>
+    <button onclick="goPage('party',this)">👥 队伍</button>
+    <button onclick="goPage('help',this)">💡 帮助</button>
+    <button id="adminNavBtn" onclick="goPage('admin',this)" style="display:none">👑 管理</button>
+    <div style="flex:1"></div>
+    <!-- 同步图标（贴近用户，点击直接保存刷新） -->
+    <div style="position:relative;padding:10px;cursor:pointer;transition:all .3s" title="保存并刷新" onclick="doSync()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:block"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10"/><path d="M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+    </div>
+    <!-- 通知图标 -->
+    <div style="position:relative;padding:10px;cursor:pointer;transition:all .3s" onclick="toggleNotifyDrop()">
+      <span style="font-size:1.1rem;display:block">🔔</span>
+      <span id="notifyDot" style="display:none;position:absolute;top:2px;right:2px;width:9px;height:9px;border-radius:50%;background:#ff6b6b;border:2px solid #fff"></span>
+      <div class="ud" id="notifyDrop" style="top:46px;right:0;min-width:220px">
+        <div style="font-weight:700;border-bottom:1px solid #f0e8f8">🔔 通知</div>
+        <div id="notifyListDrop" style="max-height:280px;overflow-y:auto;padding:0"></div>
+      </div>
+    </div>
+    <div style="position:relative;padding:10px;cursor:pointer;transition:all .3s" onclick="toggleDrop()">
+      <span style="font-size:1.1rem;display:block">👤</span>
+      <div class="ud" id="userDrop">
+        <div id="dropName" style="font-weight:700;border-bottom:1px solid #f0e8f8">思思 <span id="dropLvl" style="font-size:.7rem;color:#7a7a9e">Lv.1</span></div>
+        <div onclick="hideDrop();openAvatarEditor()">🖼️ 编辑头像</div>
+        <div onclick="hideDrop();openBio()">📝 简介</div>
+        <div onclick="hideDrop();goPage('tasks');document.querySelectorAll('.r-tab')[1].click()">🏆 成就</div>
+        <div onclick="hideDrop();openSettings()">⚙️ 设置</div>
+        <div onclick="logout()" style="color:#e74c3c">🚪 退出</div>
+      </div>
+    </div>
+  </div>
+  <div id="userBar" style="background:linear-gradient(90deg,#f0e9fa,#e9f3fc);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:10px 20px;border-bottom:1px solid rgba(255,255,255,.7);transition:background .5s ease">
+    <div style="display:flex;align-items:center;justify-content:space-between;max-width:1500px;margin:0 auto;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#fff5e6,#ffe0b2);display:flex;align-items:center;justify-content:center;font-size:1.5rem;border:3px solid #fff;cursor:pointer;position:relative" onclick="sisiMsg()">
+          <span id="mainPet">🐱</span>
+          <span id="mainHat" style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);font-size:.9rem;display:none"></span>
+          <span id="mainGlasses" style="position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:.75rem;display:none"></span>
+          <span id="mainBow" style="position:absolute;bottom:-2px;left:-2px;font-size:.8rem;display:none"></span>
+          <span id="mainScarf" style="position:absolute;bottom:2px;right:-4px;font-size:.7rem;display:none"></span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="font-weight:700;font-size:1rem" id="sName">思思</span><span id="sLvl" style="background:linear-gradient(135deg,#a18cd1,#8fd3f4);padding:2px 12px;border-radius:12px;font-size:.7rem;font-weight:700;color:#fff;box-shadow:0 2px 8px rgba(161,140,209,.3)">Lv.1</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <span style="font-size:1.05rem;font-weight:700">🪙<span id="sCoins" style="font-size:.95rem">0</span></span>
+        <span style="font-size:1.05rem;font-weight:700">🔥<span id="sStreak" style="font-size:.95rem">0天</span></span>
+        <span style="font-size:1.05rem;font-weight:700">⏳<span id="sCD" style="font-size:.95rem">-天</span></span>
+        <span id="planBtn" style="cursor:pointer;color:#a18cd1;font-weight:700;font-size:.95rem" onclick="openSetupWizard()">🚀 制定新计划</span>
+      </div>
+    </div>
+    <div style="max-width:1500px;margin:6px auto 0;display:flex;align-items:center;gap:10px">
+      <div style="flex:1;height:8px;background:rgba(240,232,248,.8);border-radius:50px;overflow:hidden;box-shadow:inset 0 2px 4px rgba(0,0,0,.06)"><div id="expFill" style="height:100%;width:0%;background:linear-gradient(90deg,#a18cd1,#8fd3f4,#a18cd1);background-size:200% 100%;border-radius:50px;transition:width .8s"></div></div>
+      <span style="font-size:.7rem;font-weight:600;color:#a18cd1;min-width:48px;text-align:right" id="expTxt">0/100</span>
+    </div>
+  </div>
+  <div style="max-width:1500px;margin:0 auto;padding:16px 24px;flex:1;width:100%">
+    <div class="page" id="p-tasks">
+      <div class="grid2">
+        <div>
+          <div style="background:rgba(255,255,255,.6);padding:10px 14px;border-radius:18px;border-left:4px solid #f6d365;font-size:.85rem;margin-bottom:12px"><span id="qText">加载中...</span></div>
+          <h3 style="margin-bottom:10px">📋 今日任务</h3>
+          <div id="taskList"></div>
+        </div>
+        <div>
+          <div class="card" style="padding:0">
+            <div style="display:flex;background:rgba(255,255,255,.5);border-radius:24px 24px 0 0;padding:6px 6px 0">
+              <button class="r-tab active" onclick="rightTab('progress',this)">📊 进度</button>
+              <button class="r-tab" onclick="rightTab('ach',this)">🏆 成就</button>
+              <button class="r-tab" onclick="rightTab('score',this)">📊 成绩</button>
+            </div>
+            <div id="rt-progress" style="padding:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><h3 style="font-size:1.05rem">📊 进度</h3><span id="dashLvl" style="background:linear-gradient(135deg,#a18cd1,#8fd3f4);padding:4px 14px;border-radius:12px;font-size:.8rem;font-weight:700;color:#fff;box-shadow:0 2px 8px rgba(161,140,209,.3)">Lv.1</span></div>
+              <div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.8rem;font-weight:600;margin-bottom:4px"><span>刷题</span><span id="testTxt">0/0</span></div><div style="height:10px;background:#f0e8f8;border-radius:50px;overflow:hidden"><div id="testFill" style="height:100%;width:0%;background:linear-gradient(90deg,#84fab0,#8fd3f4);border-radius:50px;transition:width 1s"></div></div></div>
+              <div id="rings" style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;padding:0 4px"></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px">
+                <div style="text-align:center;background:rgba(255,255,255,.6);border-radius:14px;padding:12px 6px"><div style="font-size:.85rem;color:#7a7a9e;font-weight:600">连续</div><div style="font-size:1.2rem;font-weight:800;font-family:'Baloo 2',cursive;color:#fda085" id="dStreak">0🔥</div></div>
+                <div style="text-align:center;background:rgba(255,255,255,.6);border-radius:14px;padding:12px 6px"><div style="font-size:.85rem;color:#7a7a9e;font-weight:600">任务</div><div style="font-size:1.2rem;font-weight:800;color:#84fab0" id="dTasks">0</div></div>
+                <div style="text-align:center;background:rgba(255,255,255,.6);border-radius:14px;padding:12px 6px"><div style="font-size:.85rem;color:#7a7a9e;font-weight:600">考试</div><div style="font-size:1.2rem;font-weight:800;color:#a18cd1" id="dCD">-天</div></div>
+                <div style="text-align:center;background:rgba(255,255,255,.6);border-radius:14px;padding:12px 6px"><div style="font-size:.85rem;color:#7a7a9e;font-weight:600">成就</div><div style="font-size:1.2rem;font-weight:800;color:#f6d365" id="dAch">0🏅</div></div>
+              </div>
+              <div id="wkCardR" style="margin-top:14px"></div>
+            </div>
+            <div id="rt-ach" style="display:none;padding:14px">
+              <div style="display:flex;justify-content:space-between;margin-bottom:8px"><h4 style="font-size:.9rem">🏆 成就</h4><span style="font-size:.65rem;color:#7a7a9e" id="achCnt">0/15</span></div>
+              <div id="achGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px"></div>
+            </div>
+            <div id="rt-score" style="display:none;padding:14px">
+              <h4 style="font-size:.9rem;margin-bottom:8px">📊 上传成绩</h4>
+              <div style="border:2px dashed #a18cd1;border-radius:14px;padding:12px;text-align:center;cursor:pointer;margin-bottom:10px;font-size:.8rem" onclick="document.getElementById('sfR').click()">📤 上传截图（选填）</div>
+              <input type="file" id="sfR" accept="image/*" style="display:none" onchange="handleScoreImg(this)">
+              <div id="scorePreviewR" style="display:none;text-align:center;margin-bottom:8px"><img id="scorePreviewImgR" style="max-height:80px;border-radius:10px"><button class="btn" onclick="clearScoreImg()" style="padding:2px 8px;font-size:.6rem;background:rgba(200,200,200,.3);margin-top:4px">❌移除</button></div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+                <div class="ig"><label style="font-size:.75rem">👂听力</label><input type="number" id="sL2" step=".5" min="0" max="9" oninput="previewScoreR()" style="padding:8px 10px;font-size:.8rem"></div>
+                <div class="ig"><label style="font-size:.75rem">📖阅读</label><input type="number" id="sR2" step=".5" min="0" max="9" oninput="previewScoreR()" style="padding:8px 10px;font-size:.8rem"></div>
+                <div class="ig"><label style="font-size:.75rem">✍️写作</label><input type="number" id="sW2" step=".5" min="0" max="9" oninput="previewScoreR()" style="padding:8px 10px;font-size:.8rem"></div>
+                <div class="ig"><label style="font-size:.75rem">🎤口语</label><input type="number" id="sS2" step=".5" min="0" max="9" oninput="previewScoreR()" style="padding:8px 10px;font-size:.8rem"></div>
+              </div>
+              <div id="scoreReward" style="text-align:center;color:#7a7a9e;font-size:.75rem;margin-bottom:8px">预计奖励：🪙0</div>
+              <button class="btn btn-suc" onclick="submitScoreR()" style="width:100%;padding:8px;font-size:.8rem">📊 提交</button>
+              <div style="margin-top:10px"><h4 style="font-size:.8rem;margin-bottom:4px">📜 最近记录</h4><div id="scoreHistoryR" style="font-size:.7rem;color:#7a7a9e"></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="page hide" id="p-inventory"><h3 style="margin-bottom:10px">🗃️ 仓库</h3><div class="tab-bar"><button class="active" onclick="invTab('pets',this)">🐾宠物</button><button onclick="invTab('accs',this)">🎀装扮</button><button onclick="invTab('bgs',this)">🎨背景</button></div><div class="inv-grid" id="invGrid"></div></div>
+    <div class="page hide" id="p-shop"><h3 style="margin-bottom:10px">🏪 商店</h3><p style="font-size:.85rem;color:#7a7a9e;margin-bottom:14px">持有：🪙<span id="shopCoins">0</span></p><div class="tab-bar"><button class="active" onclick="shopTab('pets',this)">🐾宠物</button><button onclick="shopTab('accs',this)">🎀装扮</button><button onclick="shopTab('bgs',this)">🎨背景</button><button onclick="shopTab('gacha',this)">🎰抽卡</button></div><div id="shopContent"></div></div>
+    <div class="page hide" id="p-party"><div class="card" style="padding:60px;text-align:center"><div style="font-size:4rem">👥</div><h3>队伍即将上线</h3></div></div>
+    <div class="page hide" id="p-help"><div class="card" style="padding:24px"><h3>💡 帮助</h3><p style="margin-top:8px">📋任务 — 每日打卡获EXP金币<br>🗃️仓库 — 查看切换宠物装扮<br>🏪商店 — 购买宠物装扮背景+抽卡</p></div></div>
+    <!-- 管理后台 -->
+    <div class="page hide" id="p-admin">
+      <h3 style="margin-bottom:12px">👑 管理后台</h3>
+      <p style="font-size:.85rem;color:#7a7a9e;margin-bottom:14px">管理员专属：拥有无限金币和经验，可自由测试商店、抽卡、打卡等功能，并可管理所有注册用户</p>
+      <button class="btn btn-sec btn-sm" onclick="renderAdminUsers()" style="margin-bottom:12px">👥 用户列表</button>
+      <div id="adminUsers"></div>
+    </div>
+    <div class="page hide" id="p-settings">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h3>⚙️ 设置</h3>
+        <button class="btn btn-sm" onclick="goPage('tasks',document.querySelectorAll('.topnav button')[0])" style="background:rgba(200,200,200,.3)">✖ 关闭</button>
+      </div>
+      <!-- 通用 -->
+      <div class="card" style="padding:18px;margin-bottom:12px">
+        <h4 style="font-size:1rem;margin-bottom:10px">⚙️ 通用设置</h4>
+        <div class="set-row"><span>👤 用户名</span><span style="color:#7a7a9e" id="setUser">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('用户名')">编辑</span></div>
+        <div class="set-row"><span>📧 邮箱</span><span style="color:#7a7a9e" id="setEmail">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('邮箱')">编辑</span></div>
+        <div class="set-row"><span>🎭 昵称</span><span style="color:#7a7a9e" id="setNick">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('昵称')">编辑</span></div>
+        <div class="set-row"><span>🔒 密码</span><span style="color:#7a7a9e">••••••</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('密码')">编辑</span></div>
+      </div>
+      <!-- 学习偏好 -->
+      <div class="card" style="padding:18px;margin-bottom:12px">
+        <h4 style="font-size:1rem;margin-bottom:10px">📚 学习偏好</h4>
+        <div class="set-row"><span>🎯 目标总分</span><span style="color:#7a7a9e" id="setTarget">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('目标总分')">编辑</span></div>
+        <div class="set-row"><span>🗓️ 考试日期</span><span style="color:#7a7a9e" id="setExam">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('考试日期')">编辑</span></div>
+        <div class="set-row"><span>📈 六级分数</span><span style="color:#7a7a9e" id="setCet">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('六级分数')">编辑</span></div>
+      </div>
+      <!-- 计划管理 -->
+      <div class="card" style="padding:18px;margin-bottom:12px">
+        <h4 style="font-size:1rem;margin-bottom:10px">🗺️ 计划管理</h4>
+        <div class="set-row"><span>🚀 重新制定备考计划</span><span style="font-size:.75rem;color:#7a7a9e">回到设置向导重新配置</span><span id="planBtn2" style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="openSetupWizard()">重新制定</span></div>
+        <div class="set-row"><span>💾 导出数据备份</span><span style="font-size:.75rem;color:#7a7a9e">下载 JSON 备份文件</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="exportData()">导出</span></div>
+        <div class="set-row"><span>📥 导入数据备份</span><span style="font-size:.75rem;color:#7a7a9e">从备份文件恢复数据</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="importData()">导入</span></div>
+      </div>
+      <!-- 账号 -->
+      <div class="card" style="padding:18px;margin-bottom:12px;border-color:#ffd1d1">
+        <h4 style="font-size:1rem;margin-bottom:10px;color:#e74c3c">⚠️ 危险区</h4>
+        <div class="set-row"><span>🔄 重置账号数据</span><span style="font-size:.75rem;color:#7a7a9e">清空所有打卡记录和进度</span><span style="cursor:pointer;color:#e74c3c;font-weight:600" onclick="resetAccount()">重置</span></div>
+        <div class="set-row"><span>🗑️ 删除账号</span><span style="font-size:.75rem;color:#7a7a9e">永久删除此账号所有数据</span><span style="cursor:pointer;color:#e74c3c;font-weight:600" onclick="deleteAccount()">删除</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- 番茄钟浮动显示 -->
+  <div id="pomoFloat" style="display:none;position:fixed;bottom:28px;right:28px;z-index:9998;background:#fff;border-radius:18px;padding:10px 16px;font-family:'Baloo 2',cursive;font-weight:700;box-shadow:0 8px 30px rgba(161,140,209,.3);cursor:pointer;animation:pop .3s ease;border:1px solid #e8e0f0">
+    <div style="display:flex;align-items:center;gap:10px">
+      <span style="font-size:1.2rem">⏳</span>
+      <div style="text-align:center">
+        <div id="pomoTime" style="font-size:1.3rem;color:#3d3d5c;line-height:1.1">25:00</div>
+        <div id="pomoTask" style="font-size:.65rem;color:#7a7a9e;max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">任务</div>
+      </div>
+      <span onclick="stopTimer()" style="font-size:.9rem;color:#ff6b6b;padding:4px;cursor:pointer">✖</span>
+    </div>
+  </div>
+  <!-- 制定新计划确认弹窗 -->
+  <div id="planConfirmOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(4px)">
+    <div style="background:#fff;border-radius:40px;padding:32px 28px;max-width:340px;width:90%;text-align:center;animation:pop .5s ease">
+      <span style="font-size:3rem;display:block;margin-bottom:8px">🚀</span>
+      <h3 style="margin-bottom:8px">进入设置向导制定新计划？</h3>
+      <p style="color:#7a7a9e;font-size:.85rem;margin-bottom:20px">生成新计划将按新参数重新计算</p>
+      <button class="btn btn-suc" onclick="confirmPlanWizard()" style="width:100%;margin-bottom:8px">✅ 进入向导</button>
+      <button class="btn btn-sm" onclick="closePlanConfirm()" style="width:100%;background:rgba(200,200,200,.3)">取消</button>
+    </div>
+  </div>
+  <div id="lvlOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.3)"><div style="background:#fff;border-radius:40px;padding:32px;text-align:center;animation:pop .5s ease"><span style="font-size:3rem">🎉</span><h2>🎊 升级！</h2><p id="lvlTxt">Lv.2</p><button class="btn btn-pri" onclick="closeLvl()">太棒了！</button></div></div>
+  <div id="perfOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.3)"><div style="background:#fff;border-radius:40px;padding:32px;text-align:center;animation:pop .5s ease"><span style="font-size:3rem">🌟</span><h2>✨ 今日完美！</h2><p>思思为你骄傲！</p><button class="btn btn-suc" onclick="closePerf()">继续！</button></div></div>
+  <div id="gachaOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.5);backdrop-filter:blur(8px)"><div style="background:#fff;border-radius:40px;padding:36px 28px;text-align:center;animation:pop .5s ease;max-width:320px"><span style="font-size:5rem;display:block;margin-bottom:8px" id="gachaEmo">🐱</span><span id="gachaR" style="display:inline-block;padding:4px 16px;border-radius:50px;font-family:'Baloo 2',cursive;font-weight:700;font-size:.85rem;margin-bottom:8px">普通</span><div style="font-size:1.3rem;font-family:'Baloo 2',cursive;font-weight:700" id="gachaN">思思</div><p style="color:#7a7a9e;margin:8px 0 16px" id="gachaMsg"></p><button class="btn btn-pri" onclick="closeGacha()">🎉 太棒了！</button></div></div>
+  <input type="file" id="importFile" accept=".json" style="display:none" onchange="doImport(this)">
+  <!-- 设置弹窗 -->
+  <div id="settingsOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(4px)">
+    <div style="background:#fff;border-radius:24px;padding:24px;max-width:520px;width:92%;max-height:82vh;overflow-y:auto;animation:pop .5s ease">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <h3>⚙️ 设置</h3>
+        <button class="btn btn-sm" onclick="closeSettings()" style="background:rgba(200,200,200,.3)">✖ 关闭</button>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:10px">
+        <h4 style="font-size:1rem;margin-bottom:10px">⚙️ 通用设置</h4>
+        <div class="set-row"><span>👤 用户名</span><span style="color:#7a7a9e" id="setUser2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('用户名')">编辑</span></div>
+        <div class="set-row"><span>📧 邮箱</span><span style="color:#7a7a9e" id="setEmail2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('邮箱')">编辑</span></div>
+        <div class="set-row"><span>🎭 昵称</span><span style="color:#7a7a9e" id="setNick2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('昵称')">编辑</span></div>
+        <div class="set-row"><span>🔒 密码</span><span style="color:#7a7a9e">••••••</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('密码')">编辑</span></div>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:10px">
+        <h4 style="font-size:1rem;margin-bottom:10px">📚 学习偏好</h4>
+        <div class="set-row"><span>🎯 目标总分</span><span style="color:#7a7a9e" id="setTarget2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('目标总分')">编辑</span></div>
+        <div class="set-row"><span>🗓️ 考试日期</span><span style="color:#7a7a9e" id="setExam2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('考试日期')">编辑</span></div>
+        <div class="set-row"><span>📈 六级分数</span><span style="color:#7a7a9e" id="setCet2">-</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="editSetting('六级分数')">编辑</span></div>
+      </div>
+      <div class="card" style="padding:16px;margin-bottom:10px">
+        <h4 style="font-size:1rem;margin-bottom:10px">🗺️ 计划管理</h4>
+        <div class="set-row"><span>🚀 重新制定备考计划</span><span style="font-size:.75rem;color:#7a7a9e">回到设置向导重新配置</span><span id="planBtn3" style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="openSetupWizard()">重新制定</span></div>
+        <div class="set-row"><span>💾 导出数据备份</span><span style="font-size:.75rem;color:#7a7a9e">下载 JSON 备份文件</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="exportData()">导出</span></div>
+        <div class="set-row"><span>📥 导入数据备份</span><span style="font-size:.75rem;color:#7a7a9e">从备份文件恢复数据</span><span style="cursor:pointer;color:#a18cd1;font-weight:600" onclick="importData()">导入</span></div>
+      </div>
+      <div class="card" style="padding:16px;border-color:#ffd1d1">
+        <h4 style="font-size:1rem;margin-bottom:10px;color:#e74c3c">⚠️ 危险区</h4>
+        <div class="set-row"><span>🔄 重置账号数据</span><span style="font-size:.75rem;color:#7a7a9e">清空所有打卡记录和进度</span><span style="cursor:pointer;color:#e74c3c;font-weight:600" onclick="resetAccount()">重置</span></div>
+        <div class="set-row"><span>🗑️ 删除账号</span><span style="font-size:.75rem;color:#7a7a9e">永久删除此账号所有数据</span><span style="cursor:pointer;color:#e74c3c;font-weight:600" onclick="deleteAccount()">删除</span></div>
+      </div>
+    </div>
+  </div>
+  <!-- 编辑头像弹窗 -->
+  <div id="avatarOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(4px)">
+    <div style="background:#fff;border-radius:40px;padding:28px 24px;max-width:400px;width:90%;text-align:center;animation:pop .5s ease">
+      <h3 style="margin-bottom:12px">🖼️ 编辑头像</h3>
+      <p style="font-size:.8rem;color:#7a7a9e;margin-bottom:10px">选择要显示的宠物（需已拥有）</p>
+      <div id="avatarPetList" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:12px"></div>
+      <p style="font-size:.8rem;color:#7a7a9e;margin-bottom:8px">装扮（购买后自动穿戴，可在这里切换）</p>
+      <div id="avatarAccList" style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:16px"></div>
+      <button class="btn btn-suc" onclick="closeAvatarEditor()" style="width:100%">✅ 完成</button>
+    </div>
+  </div>
+  <!-- 简介弹窗 -->
+  <div id="bioOv" style="display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;background:rgba(0,0,0,.4);backdrop-filter:blur(4px)">
+    <div style="background:#fff;border-radius:40px;padding:28px 24px;max-width:400px;width:90%;text-align:center;animation:pop .5s ease">
+      <h3 style="margin-bottom:12px">📝 个人简介</h3>
+      <textarea id="bioInput" rows="3" placeholder="介绍一下自己吧~" style="width:100%;padding:12px;border:2px solid #e8e0f0;border-radius:14px;font-size:.9rem;font-family:'Quicksand',sans-serif;outline:none;margin-bottom:12px;resize:vertical"></textarea>
+      <button class="btn btn-suc" onclick="saveBio()" style="width:100%">💾 保存简介</button>
+      <button class="btn btn-sm" onclick="closeBio()" style="width:100%;margin-top:6px;background:rgba(200,200,200,.3)">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== 工具函数 =====
+var $=function(id){return document.getElementById(id)};
+var user=null,wOff=0,sStep=0,curShop='pets',curInv='pets',curScoreImg=null;
+var today=function(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+var fmt=function(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+var uk=function(k){return 'u_'+user+'_'+k};
+var ld=function(k,d){try{var r=localStorage.getItem(uk(k));return r?JSON.parse(r):d}catch{return d}};
+var sd=function(k,v){localStorage.setItem(uk(k),JSON.stringify(v))};
+var gU=function(){try{return JSON.parse(localStorage.getItem('_us')||'{}')}catch{return{}}};
+var sU=function(u){localStorage.setItem('_us',JSON.stringify(u))};
+var stats=function(){return ld('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]})};
+var sStats=function(s){sd('st',s)};
+var getSisi=function(){return ld('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']})};
+var setSisi=function(s){sd('si',s)};
+
+// 数据
+var PETS=[{id:'c',e:'🐱',n:'小猫咪',r:'c'},{id:'d',e:'🐶',n:'小狗狗',r:'c'},{id:'r',e:'🐰',n:'小兔子',r:'c'},{id:'f',e:'🐸',n:'小青蛙',r:'c'},{id:'be',e:'🐻',n:'小熊',r:'r'},{id:'fx',e:'🦊',n:'小狐狸',r:'r'},{id:'m',e:'🐵',n:'小猴子',r:'r'},{id:'p',e:'🐼',n:'小熊猫',r:'e'},{id:'l',e:'🦁',n:'小狮子',r:'e'},{id:'t',e:'🐯',n:'小老虎',r:'e'},{id:'dr',e:'🐲',n:'小龙',r:'l'},{id:'u',e:'🦄',n:'独角兽',r:'l'}];
+var ACCS=[{id:'hc',n:'皇冠',e:'👑',c:300,sl:'hat'},{id:'ht',n:'礼帽',e:'🎩',c:200,sl:'hat'},{id:'gl',n:'墨镜',e:'👓',c:150,sl:'glasses'},{id:'bw',n:'蝴蝶结',e:'🎀',c:100,sl:'bow'},{id:'sf',n:'围巾',e:'🧣',c:180,sl:'scarf'}];
+var BGS=[{id:'b0',n:'默认',c:0},{id:'b1',n:'梦幻紫',c:300},{id:'b2',n:'星空蓝',c:300},{id:'b3',n:'薄荷绿',c:300},{id:'b4',n:'樱花粉',c:300},{id:'b5',n:'日落橙',c:500}];
+var AS=[
+  {id:'a1',n:'首战告捷',ic:'🌟',c:function(s){return s.tk>=1}},{id:'a2',n:'渐入佳境',ic:'✨',c:function(s){return s.tk>=10}},
+  {id:'a3',n:'小试牛刀',ic:'🔥',c:function(s){return s.sk>=3}},{id:'a4',n:'持之以恒',ic:'🔥',c:function(s){return s.sk>=7}},
+  {id:'a5',n:'坚持不懈',ic:'💥',c:function(s){return s.sk>=14}},{id:'a6',n:'无敌自律',ic:'👑',c:function(s){return s.sk>=30}},
+  {id:'a7',n:'刷题新手',ic:'📚',c:function(s){return s.ts>=5}},{id:'a8',n:'刷题达人',ic:'📚',c:function(s){return s.ts>=20}},
+  {id:'a9',n:'刷题狂魔',ic:'🤯',c:function(s){return s.ts>=50}},{id:'a10',n:'初出茅庐',ic:'⭐',c:function(s){return s.lv>=5}},
+  {id:'a11',n:'小有成就',ic:'🌟',c:function(s){return s.lv>=10}},{id:'a12',n:'副本大师',ic:'🏅',c:function(s){return s.lv>=20}},
+  {id:'a13',n:'全能战士',ic:'🎯',c:function(s){return(s.sb?.L||0)>=10&&(s.sb?.R||0)>=10&&(s.sb?.W||0)>=10&&(s.sb?.S||0)>=10}},
+  {id:'a14',n:'完美一日',ic:'💎',c:function(s){return s.pf>=1}},{id:'a15',n:'完美一周',ic:'🌈',c:function(s){return s.pf>=7}}
+];
+var DAYS=['周日','周一','周二','周三','周四','周五','周六'];
+var DAYE=['sun','mon','tue','wed','thu','fri','sat'];
+var Q=[{t:'千里之行始于足下',a:'老子'},{t:'天道酬勤',a:'古训'},{t:'IELTS 7+ is a plan',a:'思思'},{t:'如果结局不能让你满意，那就还不是结局'},{t:'我要去的地方我将会有很多的朋友。还有：如果你有机会，请放一些花在后院的阿尔吉依坟上。'},{t:'于浩歌狂热之际中寒；于天上看见深渊。于一切眼中看见无所有；于无所希望中得救。',a:'鲁迅'}];
+
+// ===== 认证 =====
+function showAuth(t){$('formLogin').style.display=t==='login'?'block':'none';$('formReg').style.display=t==='register'?'block':'none';$('tabLogin').style.background=t==='login'?'#fff':'transparent';$('tabReg').style.background=t==='register'?'#fff':'transparent';$('loginErr').textContent='';$('regErr').textContent=''}
+function handleLogin(){var u=$('loginU').value.trim(),p=$('loginP').value;if(!u||!p){$('loginErr').textContent='请填写完整！';return}
+// 管理员内置账号
+var ADMIN_PW='admin123';
+if(u==='admin'){if(p!==ADMIN_PW){$('loginErr').textContent='管理员密码错误！';return}user='admin';localStorage.setItem('_cu','admin');enterApp();return}
+var us=gU();if(!us[u]){$('loginErr').textContent='用户不存在！';return}var d=us[u];var pw=typeof d==='string'?d:d.pw;if(pw!==p){$('loginErr').textContent='密码错误！';return}user=u;localStorage.setItem('_cu',u);enterApp()}
+function isAdmin(){return user==='admin'}
+function handleRegister(){var e=$('regE').value.trim(),u=$('regU').value.trim(),p=$('regP').value,c=$('regC').value;if(!e||!/^\S+@\S+\.\S+$/.test(e)){$('regErr').textContent='邮箱无效！';return}if(u.length<3){$('regErr').textContent='至少3字符！';return}if(p.length<6){$('regErr').textContent='至少6字符！';return}if(p!==c){$('regErr').textContent='两次不一致！';return}var us=gU();if(us[u]){$('regErr').textContent='已存在！';return}us[u]={pw:p,email:e};sU(us);var o=user;user=u;sd('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]});sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('set',null);sd('pl',null);sd('ck',{});user=o;$('loginU').value=u;$('loginP').value='';$('loginErr').textContent='✅ 注册成功，请登录！';$('loginErr').style.color='#84fab0';showAuth('login')}
+function logout(){user=null;localStorage.removeItem('_cu');$('appScreen').style.display='none';$('authScreen').style.display='flex'}
+function sisiMsg(){alert(['思思说加油！','冲冲冲！','思思相信你！'][Math.floor(Math.random()*3)])}
+var _dropTimer=null;
+function toggleDrop(){hideNotifyDrop();var el=$('userDrop');if(el.style.display==='block'){el.style.display='none'}else{el.style.display='block'}}
+function hideDrop(){var el=$('userDrop');if(el)el.style.display='none'}
+
+// ===== 入口 =====
+function enterApp(){$('authScreen').style.display='none';if(isAdmin()){$('appScreen').style.display='flex';refresh();goPage('admin');return}var s=ld('set',null);if(!s){$('setupScreen').style.display='flex';setupInit();return}var p=ld('pl',null);if(!p||!p.d||!p.d.length){$('setupScreen').style.display='flex';setupInit();return}$('appScreen').style.display='flex';refresh()}
+function setupInit(){sStep=0;wOff=0;$('sgen').classList.add('hidden');$('snext').classList.remove('hidden');window._wkO=['listening','reading','writing','speaking'];renderWeak();renderSched();sShow(0)}
+function renderWeak(){var c=$('weakList');c.innerHTML='';if(!window._wkO||!window._wkO.length)window._wkO=['listening','reading','writing','speaking'];window._wkDrag=null;var lb={listening:'👂听力',reading:'📖阅读',writing:'✍️写作',speaking:'🎤口语'};window._wkO.forEach(function(k,i){
+var d=document.createElement('div');d.draggable=true;d.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.5);border-radius:14px;margin-bottom:6px;cursor:grab;user-select:none;';
+d.addEventListener('dragstart',function(e){window._wkDrag=i;e.dataTransfer.effectAllowed='move';setTimeout(function(){d.style.opacity='.4'},0)});
+d.addEventListener('dragover',function(e){e.preventDefault();e.dataTransfer.dropEffect='move';c.querySelectorAll(':scope>div').forEach(function(el){el.style.borderColor='transparent'});if(window._wkDrag!==i)d.style.borderColor='#a18cd1'});
+d.addEventListener('drop',function(e){e.preventDefault();var f=window._wkDrag;if(f===null||f===i)return;var item=window._wkO.splice(f,1)[0];window._wkO.splice(i,0,item);renderWeak();sShow(sStep)});
+d.addEventListener('dragend',function(){d.style.opacity='1';c.querySelectorAll(':scope>div').forEach(function(el){el.style.borderColor='transparent'});window._wkDrag=null});
+d.innerHTML='<span style="font-size:1.2rem;color:#7a7a9e">⠿</span><span style="flex:1;font-weight:600">'+lb[k]+'</span><span style="font-size:.75rem;background:#d5c6f0;padding:2px 12px;border-radius:50px;font-weight:700">第'+(i+1)+'弱</span><div style="display:flex;flex-direction:column;gap:2px"><button onclick="mW('+i+',-1)" style="padding:2px 8px;border:none;border-radius:8px;background:rgba(161,140,209,.2);cursor:pointer;font-size:.7rem;'+(i===0?'opacity:.3':'')+'">▲</button><button onclick="mW('+i+',1)" style="padding:2px 8px;border:none;border-radius:8px;background:rgba(161,140,209,.2);cursor:pointer;font-size:.7rem;'+(i===3?'opacity:.3':'')+'">▼</button></div>';c.appendChild(d)})}
+function mW(i,d){var a=window._wkO;var t=i+d;if(t<0||t>=a.length)return;var e=a.splice(i,1)[0];a.splice(t,0,e);renderWeak();sShow(sStep)}
+function renderSched(){var sc=$('schedC');sc.innerHTML='';DAYE.forEach(function(en,i){var r=document.createElement('div');r.style.cssText='display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.5);padding:8px 12px;border-radius:14px;margin-bottom:4px';r.innerHTML='<label style="display:flex;align-items:center;gap:8px;min-width:50px;font-weight:600"><input type="checkbox" checked onchange="tD(\''+en+'\')" style="width:18px;height:18px;accent-color:#a18cd1;cursor:pointer">'+DAYS[i]+'</label><select style="flex:1;padding:8px 12px;border-radius:14px;border:2px solid #e8e0f0;font-size:.9rem;background:#fff"><option value="full">🌞 全天（6h+）</option><option value="m_a">🌤️ 上午+下午（4-5h）</option><option value="a_e" selected>🌤️ 下午+晚上（4-5h）</option><option value="morning">🌅 上午（2-3h）</option><option value="afternoon">🌇 下午（2-3h）</option><option value="evening">🌙 晚上（2-3h）</option><option value="lite">⏳ 1小时（摸鱼）</option></select>';r.dataset.day=en;sc.appendChild(r)})}
+function tD(en){var r=document.querySelector('[data-day="'+en+'"]');if(!r)return;var cb=r.querySelector('input'),sel=r.querySelector('select');sel.disabled=!cb.checked;sel.style.opacity=cb.checked?'1':'.4'}
+function sShow(s){var steps=['step0','step1','step2','step3','step4'];steps.forEach(function(id,i){$(id).style.display=i===s?'block':'none'});$('sNum').textContent=(s+1)+'/5';$('sprev').style.visibility=s===0?'hidden':'visible';if(s===4){$('snext').classList.add('hidden');$('sgen').classList.remove('hidden')}else{$('snext').classList.remove('hidden');$('sgen').classList.add('hidden')}}
+function sPrev(){if(sStep>0){sStep--;sShow(sStep)}}
+function sNext(){if(sStep===0&&!$('sExam').value){alert('请选日期');return}if(sStep<4){sStep++;sShow(sStep)}}
+
+// ===== 计划生成 =====
+function genPlan(){var set={exam:$('sExam').value,target:parseFloat($('sTarget').value)||7,cet:parseInt($('sCet').value)||539,total:parseInt($('sTests').value)||60,weak:window._wkO,sched:{}};document.querySelectorAll('#schedC > div').forEach(function(r){var cb=r.querySelector('input');set.sched[r.dataset.day]=cb.checked?r.querySelector('select').value:'none'});sd('set',set);
+var start=new Date();start.setHours(0,0,0,0);var eDate=new Date(set.exam);var diff=Math.ceil((eDate-start)/86400000);if(diff<=0){alert('日期无效');return}var N=set.total,sch=set.sched;var dw=[];var tw=0;
+for(var d=0;d<diff;d++){var dt=new Date(start);dt.setDate(dt.getDate()+d);var en=DAYE[dt.getDay()],sc=sch[en]||'none';var w=0;if(sc==='full')w=4;else if(sc==='m_a')w=3.5;else if(sc==='a_e')w=3;else if(sc==='morning'||sc==='afternoon'||sc==='evening')w=2;else if(sc==='lite')w=1;else w=.3;dw.push({date:fmt(dt),weight:w,sched:sc});tw+=w}
+var ta=[];if(tw>0){var as=dw.map(function(d){return Math.floor(d.weight/tw*N)});var rm=N-as.reduce(function(a,b){return a+b},0);var idx=dw.map(function(d,i){return{i:i,w:d.weight}}).sort(function(a,b){return b.w-a.w});for(var i=0;i<rm&&i<idx.length;i++)as[idx[i].i]++;ta=as}else dw.forEach(function(){ta.push(0)})
+var tc=0;var days=[];var SCHED_MIN={full:360,m_a:270,a_e:270,morning:150,afternoon:150,evening:150,lite:60};var TASK_MIN={full_test:100,listening_analysis:25,reading_analysis:25,writing_task1:45,writing_task2:60,speaking:30,vocabulary:20,review:20,light:20};for(var d=0;d<diff;d++){var _dw=dw[d],nt=ta[d]||0,tasks=[],date=_dw.date;var dayMin=SCHED_MIN[_dw.sched]||120;for(var t=0;t<nt&&tc<N;t++){var l=TS[tc%TS.length];tasks.push({id:'t'+date+'_'+tc,type:'full_test',l:'📝刷'+l+'第'+(tc+1)+'套',ex:20,co:8,sub:'L'});tc++;tasks.push({id:'la'+date+'_'+t,type:'listening_analysis',l:'🔍精析听力错题',ex:10,co:4,sub:'L'});tasks.push({id:'ra'+date+'_'+t,type:'reading_analysis',l:'🔍精析阅读错题',ex:10,co:4,sub:'R'})}
+var isH=_dw.sched==='full'||_dw.sched==='m_a'||_dw.sched==='a_e',isL=_dw.sched==='morning'||_dw.sched==='afternoon'||_dw.sched==='evening';if(isH&&d%3===1)tasks.push({id:'w1'+date,type:'writing_task1',l:'✍️小作文',ex:12,co:5,sub:'W'});if(isH&&d%3===2)tasks.push({id:'w2'+date,type:'writing_task2',l:'✍️大作文',ex:15,co:6,sub:'W'});if((isH||isL)&&d%2===0)tasks.push({id:'sp'+date,type:'speaking',l:'🎤口语练习',ex:12,co:5,sub:'S'});if(d%2===0)tasks.push({id:'vo'+date,type:'vocabulary',l:'📖词汇背诵',ex:8,co:3,sub:'L'});if(d%4===0)tasks.push({id:'rv'+date,type:'review',l:'📓错题本复习',ex:8,co:3,sub:'R'});if(!tasks.length)tasks.push({id:'li'+date,type:'light',l:'📚复习笔记',ex:6,co:2,sub:'R'});
+var totalMin=0;tasks.forEach(function(t){totalMin+=TASK_MIN[t.type]||20});tasks.forEach(function(t){t.time=Math.max(10,Math.round((TASK_MIN[t.type]||20)/totalMin*dayMin))});days.push({date,tasks})}
+sd('pl',{d:days,total:N});sd('ck',{});$('setupScreen').style.display='none';$('appScreen').style.display='flex';refresh()}
+var TS=[];for(var b=4;b<=19;b++)for(var t=1;t<=4;t++)TS.push('剑'+b+'-T'+t);
+
+// ===== 刷新 =====
+function refresh(){var q=Q[Math.floor(Math.random()*Q.length)];$('qText').textContent=q.t+(q.a?' —'+q.a:'');upBar();upAvatar();upTasks();upWeek();upDash();upAch();renderNotifyDot();showAdminNav()}
+function upBar(){var s=stats();$('sName').textContent=user||'思思';$('sLvl').textContent='Lv.'+s.lv;var n=s.lv*100;$('expFill').style.width=Math.min(100,Math.max(0,s.ex)/n*100)+'%';$('expTxt').textContent=Math.max(0,s.ex)+'/'+n;$('sCoins').textContent=isAdmin()?'∞':Math.max(0,s.co);$('sStreak').textContent=s.sk+'天';var set=ld('set',null);$('sCD').textContent=set?Math.ceil((new Date(set.exam)-new Date())/86400000)+'天':'-天';var dn=$('dropName');if(dn)dn.innerHTML=(user||'思思')+' <span style="font-size:.7rem;color:#7a7a9e">Lv.'+s.lv+'</span>'}
+function upAvatar(){var si=getSisi();var pet=PETS.find(function(p){return p.id===si.p});var em=$('mainPet');if(em)em.textContent=pet?pet.e:'🐱';var a=si.ac||{};var slots={hat:'mainHat',glasses:'mainGlasses',bow:'mainBow',scarf:'mainScarf'};Object.keys(slots).forEach(function(sl){var el=$(slots[sl]);if(!el)return;var aid=a[sl];var acc=aid?ACCS.find(function(x){return x.id===aid}):null;if(acc){el.textContent=acc.e;el.style.display='block'}else{el.style.display='none'}})
+// 应用背景：蛋仔派对风格糖果渐变（明亮柔和）+ 用户进度栏互补色
+var bgMap={b1:'linear-gradient(135deg,#c9b6f0 0%,#e6d9fa 40%,#bfe0f5 100%)',b2:'linear-gradient(135deg,#b5e0f7 0%,#d9f0fb 40%,#e0d6f7 100%)',b3:'linear-gradient(135deg,#b9eccf 0%,#ddf6e6 40%,#bfe0f5 100%)',b4:'linear-gradient(135deg,#f6c9dd 0%,#fbe6ef 40%,#d9e9f8 100%)',b5:'linear-gradient(135deg,#f8d4b8 0%,#fdeee2 40%,#e6d9fa 100%)'};
+var bg=si.bg||'b0';var app=$('appScreen');if(app){app.style.background=bgMap[bg]||'linear-gradient(135deg,#e8d5f5,#d5e8f7 50%,#e8f5e0 100%)'}
+var barMap={b1:'linear-gradient(90deg,#f0ebfa,#f3eefc)',b2:'linear-gradient(90deg,#eef5fb,#eef5fb)',b3:'linear-gradient(90deg,#eef9f1,#eef9f1)',b4:'linear-gradient(90deg,#fcf0f4,#fcf0f4)',b5:'linear-gradient(90deg,#fcf3eb,#fcf3eb)'};
+var bar=$('userBar');if(bar){bar.style.background=barMap[bg]||'linear-gradient(90deg,#f0e9fa,#e9f3fc)';bar.style.borderBottom='1px solid rgba(255,255,255,.7)'}
+// 主题强调色：进度条 / Lv徽章 / 经验文字随背景变化
+var accentMap={b1:'#a18cd1',b2:'#6fb8e8',b3:'#5ecf8e',b4:'#f09ac4',b5:'#f8b26a'};
+var accentDarkMap={b1:'#8a6fc7',b2:'#4a9ed4',b3:'#3fae77',b4:'#e07aa8',b5:'#ec9447'};
+var accent=accentMap[bg]||'#a18cd1';
+var accentDark=accentDarkMap[bg]||'#8a6fc7';
+window._lastAccentDark=accentDark;
+// 导航下划线跟随主题
+var nav=document.querySelector('.topnav');if(nav)nav.style.setProperty('--acc',accent);
+var lv=$('sLvl');if(lv){lv.style.background='linear-gradient(135deg,'+accent+',#8fd3f4)';lv.style.boxShadow='0 2px 8px rgba(0,0,0,.15)'}
+var exp=$('expFill');if(exp){exp.style.background='linear-gradient(90deg,'+accent+',#8fd3f4,'+accent+')'}
+var expt=$('expTxt');if(expt)expt.style.color=accent
+// 进度选项卡内的 Lv 徽章 + 刷题进度条也跟随主题
+var dl=$('dashLvl');if(dl){dl.style.background='linear-gradient(135deg,'+accent+',#8fd3f4)'}
+var tf=$('testFill');if(tf){tf.style.background='linear-gradient(90deg,'+accent+',#8fd3f4)'}
+var pb=$('planBtn');if(pb)pb.style.color=accentDark
+var pb2=$('planBtn2');if(pb2)pb2.style.color=accentDark}
+function upAch(){var s=stats(),un=new Set(s.ah||[]);$('achGrid').innerHTML=AS.map(function(a){return '<div style="text-align:center;padding:10px 4px;background:rgba(255,255,255,.75);border-radius:14px;border:2px solid '+(un.has(a.id)?'#f6d365':'transparent')+';'+(un.has(a.id)?'':'filter:grayscale(1);opacity:.5')+'"><span style="font-size:1.5rem;display:block">'+a.ic+'</span><span style="font-size:.7rem;font-weight:700">'+a.n+'</span></div>'}).join('');$('achCnt').textContent=(s.ah||[]).length+'/'+AS.length}
+function upDash(){var s=stats(),set=ld('set',null),pl=ld('pl',null);var tt=pl?pl.total:(set?set.total:0),dn=s.ts||0;$('testTxt').textContent=dn+'/'+tt;$('testFill').style.width=(tt>0?Math.min(100,dn/tt*100):0)+'%';upRings(s);$('dStreak').innerHTML=(s.sk||0)+'🔥';$('dTasks').textContent=s.tk||0;$('dCD').textContent=set?(Math.ceil((new Date(set.exam)-new Date())/86400000)||0)+'天':'-天';$('dAch').innerHTML=(s.ah||[]).length+'🏅';$('dashLvl').textContent='Lv.'+s.lv}
+function upRings(s){var c=$('rings'),sb=s.sb||{},mx=50;var items=[{k:'L',lb:'👂听',cl:'#8fd3f4'},{k:'R',lb:'📖读',cl:'#84fab0'},{k:'W',lb:'✍️写',cl:'#f6d365'},{k:'S',lb:'🎤口',cl:'#fda085'}];c.innerHTML=items.map(function(x){var v=sb[x.k]||0,p=Math.min(100,v/mx*100),r=30,circ=2*Math.PI*r,off=circ-p/100*circ;return '<div style="text-align:center;min-width:76px"><svg width="66" height="66" viewBox="0 0 66 66"><circle cx="33" cy="33" r="'+r+'" fill="none" stroke="#f0e8f8" stroke-width="6"/><circle cx="33" cy="33" r="'+r+'" fill="none" stroke="'+x.cl+'" stroke-width="6" stroke-linecap="round" stroke-dasharray="'+circ+'" stroke-dashoffset="'+off+'"/></svg><div style="font-size:.85rem;color:#7a7a9e;margin-top:4px;font-weight:700">'+x.lb+'</div><div style="font-size:1rem;font-weight:800;color:'+x.cl+'">'+v+'</div></div>'}).join('')}
+function getT(){var p=ld('pl',null);if(!p||!p.d)return[];var d=p.d.find(function(x){return x.date===today()});return d?d.tasks:[]}
+function upTasks(){var c=$('taskList');var ts=getT();var ck=ld('ck',{});var t=today();var dd=ck[t]||{c:[],al:false};var se=new Set(dd.c);if(!ts||!ts.length){c.innerHTML='<div style="text-align:center;padding:40px;color:#7a7a9e">🎉<br/>今天无任务</div>';return}
+// 已完成的排到最后
+var sorted=ts.slice().sort(function(a,b){var da=se.has(a.id)?1:0,db=se.has(b.id)?1:0;return da-db});
+c.innerHTML=sorted.map(function(task){var d=se.has(task.id);var mins=task.time?task.time+'分钟':'30分钟';var isRunning=window._timer&&window._timer.id===task.id;var btn=isRunning?'<button class="btn btn-sm" style="background:linear-gradient(135deg,#a18cd1,#8fd3f4);color:#fff;padding:7px 16px;font-size:.85rem;border-radius:50px;box-shadow:0 2px 8px rgba(161,140,209,.3)" onclick="stopTimer()">⏸ '+_fmtTimer(_timer.left)+'</button>':'<button class="btn btn-sm" style="background:rgba(161,140,209,.12);color:#a18cd1;border:1.5px solid rgba(161,140,209,.4);padding:7px 18px;font-size:.85rem;border-radius:50px;box-shadow:none" onclick="startTimer(\''+task.id+'\')">▶ 开始</button>';return '<div class="tc '+(d?'ok':'')+'" id="taskrow_'+task.id+'"><div class="chk '+(d?'on':'')+'" onclick="tog(\''+task.id+'\')">'+(d?'✓':'')+'</div><div style="flex:1"><div class="tspan">'+task.l+'</div><div style="font-size:.7rem;color:#7a7a9e;margin-top:2px">⏱️'+mins+' · +'+(task.ex||10)+'EXP · +'+(task.co||3)+'🪙</div></div>'+(d?'':'<div id="timerbtn_'+task.id+'">'+btn+'</div>')+'</div>'}).join('');
+var al=ts.length>0&&ts.every(function(x){return se.has(x.id)});if(al&&!dd.al){dd.al=true;ck[t]=dd;sd('ck',ck);var s=stats();s.pf++;s.co+=30;sStats(s);setTimeout(function(){$('perfOv').style.display='flex'},500)}}
+// ===== 番茄钟计时器 =====
+var _timer=null;
+function _fmtTimer(secs){var m=Math.floor(secs/60);var s=secs%60;return (m<10?'0':'')+m+':'+(s<10?'0':'')+s}
+function startTimer(id){
+  if(_timer)stopTimer(false);
+  var ts=getT();var task=ts.find(function(x){return x.id===id});if(!task)return;
+  var secs=(task.time||30)*60;
+  _timer={id:id,left:secs,interval:null};
+  _timer.interval=setInterval(function(){
+    _timer.left--;
+    var el=$('timerbtn_'+id);
+    if(el)el.innerHTML='<button class="btn btn-sm" style="background:linear-gradient(135deg,#a18cd1,#8fd3f4);color:#fff;padding:7px 16px;font-size:.85rem;border-radius:50px;box-shadow:0 2px 8px rgba(161,140,209,.3)" onclick="stopTimer()">⏸ '+_fmtTimer(_timer.left)+'</button>';
+    var pf=$('pomoFloat');
+    if(pf){pf.style.display='block';$('pomoTime').textContent=_fmtTimer(_timer.left);$('pomoTask').textContent=task.l}
+    if(_timer.left<=0){
+      clearInterval(_timer.interval);_timer=null;
+      var pf2=$('pomoFloat');if(pf2)pf2.style.display='none';
+      alert('⏰ 时间到！已完成：'+task.l);tog(id)
+    }
+  },1000);
+  var el=$('timerbtn_'+id);
+  if(el)el.innerHTML='<button class="btn btn-sm" style="background:linear-gradient(135deg,#a18cd1,#8fd3f4);color:#fff;padding:7px 16px;font-size:.85rem;border-radius:50px;box-shadow:0 2px 8px rgba(161,140,209,.3)" onclick="stopTimer()">⏸ '+_fmtTimer(secs)+'</button>';
+  var pf=$('pomoFloat');
+  if(pf){pf.style.display='block';$('pomoTime').textContent=_fmtTimer(secs);$('pomoTask').textContent=task.l}
+}
+function stopTimer(flag){if(!_timer)return;clearInterval(_timer.interval);_timer=null;var pf=$('pomoFloat');if(pf)pf.style.display='none';upTasks()}
+function tog(id){var ck=ld('ck',{});var t=today();if(!ck[t])ck[t]={c:[],al:false};var ar=ck[t].c;var idx=ar.indexOf(id);var ts=getT();var task=ts.find(function(x){return x.id===id});var er=task?task.ex:10,cr=task?task.co:3;var s=stats();
+if(idx>=0){
+  // 如果之前达到过完美日，取消任务时要扣回完美奖励（防刷分，允许为负形成欠账）
+  if(ck[t].al){s.pf=Math.max(0,(s.pf||0)-1);s.co-=30}
+  ar.splice(idx,1);ck[t].al=false;sd('ck',ck);
+  // 扣回经验/金币：不截断到0，允许为负（欠账），完成时先还清
+  s.ex-=er;s.co-=cr;
+  // 扣回经验若为负则逐级降级并返还对应经验
+  while(s.ex<0&&s.lv>1){s.lv--;s.ex+=(s.lv+1)*100}
+  s.tk=Math.max(0,(s.tk||0)-1);
+  if(task&&task.sub)s.sb[task.sub]=Math.max(0,(s.sb[task.sub]||0)-1);
+  if(task&&task.l.indexOf('刷')>=0)s.ts=Math.max(0,(s.ts||0)-1);
+  sStats(s);upTasks();upBar();upDash();upAch();return}
+if(_timer&&_timer.id===id){clearInterval(_timer.interval);_timer=null;var pf=$('pomoFloat');if(pf)pf.style.display='none'}
+ar.push(id);ck[t].c=ar;sd('ck',ck);s.ex+=er;s.co+=cr;s.tk=(s.tk||0)+1;if(task&&task.sub)s.sb[task.sub]=(s.sb[task.sub]||0)+1;if(task&&task.l.indexOf('刷')>=0)s.ts=(s.ts||0)+1;var en=s.lv*100;var lu=false;while(s.ex>=en){s.ex-=en;s.lv++;lu=true}sStats(s);upBar();upDash();upAch();
+// 完成动画：划线 → 600ms 后移动到末尾
+var row=$('taskrow_'+id);
+if(row){row.classList.add('done-anim');setTimeout(function(){upTasks();if(lu){setTimeout(function(){$('lvlTxt').textContent='恭喜Lv.'+s.lv+'！';$('lvlOv').style.display='flex'},300);confetti()}chAch()},520)}else{upTasks();if(lu){setTimeout(function(){$('lvlTxt').textContent='恭喜Lv.'+s.lv+'！';$('lvlOv').style.display='flex'},300);confetti()}chAch()}}
+function confetti(){var c=document.createElement('div');c.style.cssText='position:fixed;inset:0;pointer-events:none;z-index:99999';document.body.appendChild(c);for(var i=0;i<40;i++){var p=document.createElement('div');p.style.cssText='position:absolute;width:10px;height:10px;border-radius:3px;top:-20px;left:'+Math.random()*100+'vw;background:'+['#f6d365','#fda085','#84fab0','#a18cd1'][i%4]+';animation:fall 3s ease-in forwards;animation-delay:'+Math.random()*1.5+'s';c.appendChild(p)}setTimeout(function(){c.remove()},4000)}
+function chAch(){var s=stats(),un=new Set(s.ah||[]);var nu=false;var ctx={tk:s.tk||0,sk:s.sk||0,ts:s.ts||0,lv:s.lv||0,sb:s.sb||{},pf:s.pf||0};for(var i=0;i<AS.length;i++){var a=AS[i];if(!un.has(a.id)&&a.c(ctx)){un.add(a.id);nu=true;setTimeout(function(){alert('🏆'+a.n+'！');confetti()},200)}}if(nu){s.ah=Array.from(un);sStats(s);upAch();upDash()}}
+
+// ===== 周视图 =====
+function upWeek(){var g=$('wkCardR');if(!g)return;var n=new Date();n.setHours(0,0,0,0);var ws=new Date(n);ws.setDate(ws.getDate()+wOff*7);var m=new Date(ws);m.setDate(m.getDate()-((m.getDay()+6)%7));var pl=ld('pl',null),ck=ld('ck',{}),ts=today();var we=new Date(m);we.setDate(we.getDate()+6);var h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px"><button onclick="wOff--;upWeek()" style="background:rgba(255,255,255,.6);border:none;width:28px;height:28px;border-radius:50%;font-size:1rem;cursor:pointer">◀</button><span style="font-weight:700;font-size:.85rem">'+fmt(m).slice(5)+'-'+fmt(we).slice(5)+'</span><button onclick="wOff++;upWeek()" style="background:rgba(255,255,255,.6);border:none;width:28px;height:28px;border-radius:50%;font-size:1rem;cursor:pointer">▶</button></div><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px">';
+for(var i=0;i<7;i++){var dt=new Date(m);dt.setDate(dt.getDate()+i);var ds=fmt(dt);var isT=ds===ts;var dp=pl?pl.d.find(function(p){return p.date===ds}):null;var dc=ck[ds];var tc=dp?dp.tasks.length:0;var dn=dc?dc.c.length:0;var al=tc>0&&dn>=tc;h+='<div onclick="showDayPlan(\''+ds+'\')" style="text-align:center;padding:4px 2px;border-radius:14px;background:'+(isT?'linear-gradient(135deg,#f6d365,#fda085)':'rgba(255,255,255,.5)')+';color:'+(isT?'#fff':'#3d3d5c')+';cursor:pointer;font-size:.65rem"><div style="font-size:.55rem;color:'+(isT?'rgba(255,255,255,.7)':'#7a7a9e')+'">'+DAYS[i]+'</div><div style="font-size:.85rem;font-weight:700">'+dt.getDate()+'</div>'+(al?'<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:#84fab0"></span>':dn>0?'<span style="display:inline-block;width:4px;height:4px;border-radius:50%;background:#f6d365"></span>':'')+'</div>'}
+h+='</div><div style="margin-top:6px;font-size:.75rem" id="dayPlanR"></div>';g.innerHTML=h;showDayPlan(ts)}
+function showDayPlan(ds){var c=$('dayPlanR');if(!c)return;var pl=ld('pl',null),ck=ld('ck',{});var dp=pl?pl.d.find(function(d){return d.date===ds}):null;var dc=ck[ds]||{c:[]};if(!dp||!dp.tasks.length){c.innerHTML='';return}var se=new Set(dc.c);c.innerHTML='<div style="font-weight:700;margin-bottom:4px;font-size:.8rem">📅 '+ds+' '+se.size+'/'+dp.tasks.length+'</div>'+dp.tasks.map(function(t){return '<div style="display:flex;align-items:center;gap:4px;padding:2px 0;font-size:.7rem;'+(se.has(t.id)?'opacity:.5;text-decoration:line-through':'')+'"><span>'+(se.has(t.id)?'✅':'◻️')+'</span>'+t.l+'</div>'}).join('')}
+
+// ===== 页面切换 =====
+function goPage(id,btn){if(id==='admin'&&!isAdmin()){alert('仅管理员可访问！');return}document.querySelectorAll('.page').forEach(function(e){e.classList.add('hide');e.classList.remove('show')});var p=$('p-'+id);if(p){p.classList.remove('hide');p.classList.add('show')}document.querySelectorAll('.topnav button').forEach(function(e){e.classList.remove('active')});if(btn)btn.classList.add('active');if(id==='tasks'){upDash();upAch()}if(id==='shop')renderShop();if(id==='inventory')renderInv();if(id==='admin'){renderAdminUsers()}}
+function rightTab(tab,b){['progress','ach','score'].forEach(function(t){$('rt-'+t).style.display=t===tab?'block':'none'});document.querySelectorAll('.r-tab').forEach(function(e){e.classList.remove('active')});if(b)b.classList.add('active');if(tab==='progress'){upDash();upWeek()}if(tab==='ach')upAch();if(tab==='score')updateScoreHistory()}
+function updateScoreHistory(){var rec=ld('sc',[]);$('scoreHistoryR').innerHTML=rec.length?rec.slice().reverse().slice(0,5).map(function(r){return '<div style="padding:4px 0">'+r.date+' 🪙+'+r.reward+'</div>'}).join(''):'<p>暂无记录</p>'}
+
+// ===== 成绩 =====
+function scoreCoin(x){if(x>=9)return 100;if(x>=8)return 60;if(x>=7.5)return 40;if(x>=7)return 25;if(x>=6.5)return 15;if(x>=6)return 10;if(x>=5.5)return 5;return 0}
+function previewScoreR(){var s=['sL2','sR2','sW2','sS2'].map(function(id){return parseFloat($(id).value)||0});var t=0;for(var i=0;i<s.length;i++){t+=scoreCoin(s[i])}$('scoreReward').textContent='预计奖励：🪙'+t}
+function handleScoreImg(i){var f=i.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){curScoreImg=e.target.result;$('scorePreviewImgR').src=curScoreImg;$('scorePreviewR').style.display='block'};r.readAsDataURL(f)}
+function clearScoreImg(){curScoreImg=null;$('scorePreviewR').style.display='none';$('sfR').value=''}
+function submitScoreR(){var s=['sL2','sR2','sW2','sS2'].map(function(id){return parseFloat($(id).value)||0});if(s.every(function(x){return !x})){alert('请至少输入一科成绩！');return}for(var i=0;i<4;i++){if(s[i]>9||s[i]<0){alert('分数0-9之间！');return}}
+if(!curScoreImg){alert('⚠️ 必须上传成绩截图才能获得金币！');return}
+var rw=0;var parts=[];for(var i=0;i<s.length;i++){var x=s[i];var names=['👂听力','📖阅读','✍️写作','🎤口语'];var g=scoreCoin(x);if(x>0){rw+=g;parts.push(names[i]+x+'分🪙'+g)}}var stt=stats();stt.co+=rw;var avg=s.filter(function(x){return x>0}).reduce(function(a,b){return a+b},0)/s.filter(function(x){return x>0}).length||0;var be=0;if(avg>=8)be=50;else if(avg>=7)be=30;else if(avg>=6)be=15;stt.ex+=be;var en=stt.lv*100;var lu=false;while(stt.ex>=en){stt.ex-=en;stt.lv++;lu=true}sStats(stt);var rec=ld('sc',[]);rec.push({date:today(),scores:s,reward:rw,exp:be,img:curScoreImg});sd('sc',rec);['sL2','sR2','sW2','sS2'].forEach(function(id){$(id).value=''});clearScoreImg();previewScoreR();alert('📊提交成功！\n'+parts.join('\n')+'\n合计：🪙'+rw+(be?' +'+be+'EXP':'')+(avg>=7?'\n🏆高分！':''));if(lu){setTimeout(function(){$('lvlTxt').textContent='恭喜Lv.'+stt.lv+'！';$('lvlOv').style.display='flex'},300);confetti()}upBar();updateScoreHistory()}
+
+// ===== 商店 =====
+function shopTab(t,b){curShop=t;document.querySelectorAll('#p-shop .tab-bar button').forEach(function(e){e.classList.remove('active')});if(b)b.classList.add('active');renderShop()}
+function renderShop(){var c=$('shopContent');var s=stats();var si=getSisi();var op=new Set(si.ps||[]);var oa=new Set(si.acs||[]);var ob=new Set(si.bgs||['b0']);$('shopCoins').textContent=isAdmin()?'∞':Math.max(0,s.co);
+if(curShop==='gacha'){c.innerHTML='<div class="card" style="text-align:center;padding:24px"><div style="font-size:4rem">🎰</div><h3>思思扭蛋机</h3><p style="color:#7a7a9e;margin:8px 0 12px">🪙200抽一次！有概率获得稀有宠物！</p><button class="btn btn-gacha" onclick="doGacha()">🎲抽1次(🪙200)</button><p style="font-size:.75rem;color:#7a7a9e;margin-top:6px">持有：🪙'+(isAdmin()?'∞':s.co)+'</p><div style="margin-top:12px;padding:12px;background:rgba(255,255,255,.5);border-radius:14px;font-size:.7rem">普通50% · 稀有30% · 史诗15% · <span style="color:#ffd700;font-weight:700">传说5%</span></div><div id="ownedPetsR" style="margin-top:12px;display:flex;flex-wrap:wrap;justify-content:center;gap:6px"></div></div>';upPets();return}
+var h='<div class="shop-grid">';if(curShop==='pets'){PETS.forEach(function(p){var o=op.has(p.id);h+='<div class="shop-item '+(o?'owned':'')+'" onclick="'+(o?'':'buyPet(\''+p.id+'\')')+'"><span class="ic">'+p.e+'</span><span class="sn">'+p.n+'</span><span class="shop-badge">'+(o?'✅已有':'🪙500')+'</span></div>'})}
+else if(curShop==='accs'){ACCS.forEach(function(a){var o=oa.has(a.id);h+='<div class="shop-item '+(o?'owned':'')+'" onclick="'+(o?'':'buyAcc(\''+a.id+'\')')+'"><span class="ic">'+a.e+'</span><span class="sn">'+a.n+'</span><span class="shop-badge">'+(o?'✅已穿戴':'🪙'+a.c)+'</span></div>'})}
+else if(curShop==='bgs'){BGS.forEach(function(b){var o=ob.has(b.id);h+='<div class="shop-item '+(o?'owned':'')+'" onclick="'+(o||b.c===0?'':'buyBg(\''+b.id+'\')')+'"><span class="ic">🎨</span><span class="sn">'+b.n+'</span><span class="shop-badge">'+(o?'✅使用中':b.c===0?'默认':'🪙'+b.c)+'</span></div>'})}
+h+='</div>';c.innerHTML=h||'<p style="color:#7a7a9e">暂无商品</p>'}
+function buyPet(id){var s=stats(),si=getSisi();if(!isAdmin()){if((s.co||0)<500){alert('需要🪙500！');return}if(!si.ps)si.ps=['c'];if(si.ps.includes(id)){alert('已拥有！');return}si.ps.push(id);si.p=id;s.co-=500;sStats(s);setSisi(si);renderShop();upBar();alert('🎉获得新宠物！')}else{if(!si.ps)si.ps=['c'];if(si.ps.indexOf(id)<0)si.ps.push(id);si.p=id;setSisi(si);renderShop();upBar();upAvatar();alert('👑 管理员免费获得新宠物！')}}
+function buyAcc(id){var s=stats(),si=getSisi(),a=ACCS.find(function(x){return x.id===id});if(!a)return;if(!isAdmin()){if((s.co||0)<a.c){alert('需要🪙'+a.c+'！');return}if(!si.acs)si.acs=[];if(si.acs.includes(id)){alert('已拥有！');return}si.acs.push(id);if(!si.ac)si.ac={};si.ac[a.sl]=id;s.co-=a.c;sStats(s);setSisi(si);renderShop();upBar();upAvatar();alert('🎀已穿戴！')}else{if(!si.acs)si.acs=[];if(si.acs.indexOf(id)<0)si.acs.push(id);if(!si.ac)si.ac={};si.ac[a.sl]=id;setSisi(si);renderShop();upBar();upAvatar();alert('👑 管理员免费穿戴！')}}
+function buyBg(id){var s=stats(),si=getSisi(),b=BGS.find(function(x){return x.id===id});if(!b)return;if(!isAdmin()){if((s.co||0)<b.c){alert('需要🪙'+b.c+'！');return}if(!si.bgs)si.bgs=['b0'];if(si.bgs.includes(id)){alert('已拥有！');return}si.bgs.push(id);si.bg=id;s.co-=b.c;sStats(s);setSisi(si);renderShop();upBar();upAvatar();alert('🎨解锁背景！')}else{if(!si.bgs)si.bgs=['b0'];if(si.bgs.indexOf(id)<0)si.bgs.push(id);si.bg=id;setSisi(si);renderShop();upBar();upAvatar();alert('👑 管理员免费解锁背景！')}}
+function doGacha(){var s=stats();if(!isAdmin()){if((s.co||0)<200){alert('需要🪙200！');return}s.co-=200;sStats(s)}var p=(function(){var r=Math.random();var pool=PETS.filter(function(p){return p.r===(r<.05?'l':r<.2?'e':r<.5?'r':'c')});return pool[Math.floor(Math.random()*pool.length)]})();var si=getSisi();if(!si.ps)si.ps=['c'];var n=!si.ps.includes(p.id);if(n){si.ps.push(p.id);si.p=p.id}setSisi(si);$('gachaEmo').textContent=p.e;var rn={c:'普通',r:'稀有',e:'史诗',l:'传说'};$('gachaR').textContent=rn[p.r]||p.r;$('gachaR').style.background=p.r==='l'?'linear-gradient(135deg,#ffd700,#ff6b6b)':p.r==='e'?'#ce93d8':p.r==='r'?'#b3e5fc':'#e0e0e0';$('gachaR').style.color=p.r==='l'?'#fff':p.r==='e'?'#6a1b9a':p.r==='r'?'#0277bd':'#666';$('gachaN').textContent=p.n;$('gachaMsg').textContent=n?'🎊新伙伴！':'再次遇到'+p.n;$('gachaOv').style.display='flex';confetti();upBar();renderShop();upPets()}
+function closeGacha(){$('gachaOv').style.display='none'}
+function upPets(){var si=getSisi();$('ownedPetsR').innerHTML=(si.ps||['c']).map(function(id){var p=PETS.find(function(p){return p.id===id});return p?'<span style="font-size:2rem;cursor:pointer;'+(p.id===si.p?'border:2px solid gold;border-radius:50%;padding:4px':'opacity:.5')+'" onclick="switchPet(\''+p.id+'\')" title="'+p.n+'">'+p.e+'</span>':''}).join('')}
+function switchPet(id){var si=getSisi();si.p=id;setSisi(si);renderInv();renderShop();upBar();upAvatar()}
+
+// ===== 仓库 =====
+function invTab(t,b){curInv=t;document.querySelectorAll('#p-inventory .tab-bar button').forEach(function(e){e.classList.remove('active')});if(b)b.classList.add('active');renderInv()}
+function renderInv(){var c=$('invGrid'),si=getSisi();var h='';if(curInv==='pets'){(si.ps||['c']).map(function(id){return PETS.find(function(p){return p.id===id})}).filter(Boolean).forEach(function(p){h+='<div class="shop-item '+(p.id===si.p?'owned':'')+'" onclick="switchPet(\''+p.id+'\')"><span class="ic">'+p.e+'</span><span class="sn">'+p.n+'</span><span class="shop-badge" style="background:'+(p.id===si.p?'#84fab0':'rgba(200,200,200,.3)')+'">'+(p.id===si.p?'使用中':'点击切换')+'</span></div>'})}
+else if(curInv==='accs'){(si.acs||[]).map(function(id){return ACCS.find(function(a){return a.id===id})}).filter(Boolean).forEach(function(a){var eq=si.ac&&si.ac[a.sl]===a.id;h+='<div class="shop-item '+(eq?'owned':'')+'" onclick="switchAcc(\''+a.id+'\')"><span class="ic">'+a.e+'</span><span class="sn">'+a.n+'</span><span class="shop-badge" style="background:'+(eq?'#84fab0':'rgba(200,200,200,.3)')+'">'+(eq?'已穿戴':'点击装备')+'</span></div>'})}
+else if(curInv==='bgs'){(si.bgs||['b0']).map(function(id){return BGS.find(function(b){return b.id===id})}).filter(Boolean).forEach(function(b){h+='<div class="shop-item '+(b.id===si.bg?'owned':'')+'" onclick="switchBg(\''+b.id+'\')"><span class="ic">🎨</span><span class="sn">'+b.n+'</span><span class="shop-badge" style="background:'+(b.id===si.bg?'#84fab0':'rgba(200,200,200,.3)')+'">'+(b.id===si.bg?'使用中':'点击切换')+'</span></div>'})}
+c.innerHTML=h||'<p style="color:#7a7a9e">空的</p>'}
+function switchAcc(id){var si=getSisi(),a=ACCS.find(function(x){return x.id===id});if(!a)return;if(!si.ac)si.ac={};
+// 已穿着则卸下，否则穿戴
+if(si.ac[a.sl]===a.id){delete si.ac[a.sl]}else{si.ac[a.sl]=id}
+setSisi(si);renderInv();upBar();upAvatar()}
+function switchBg(id){var si=getSisi();si.bg=id;setSisi(si);renderInv();upBar();upAvatar()}
+function closeLvl(){$('lvlOv').style.display='none'}function closePerf(){$('perfOv').style.display='none'}
+function openSetupWizard(){$('planConfirmOv').style.display='flex'}
+function confirmPlanWizard(){$('planConfirmOv').style.display='none';sd('pl',null);sd('ck',{});sd('set',null);sd('_hl','');$('appScreen').style.display='none';$('setupScreen').style.display='flex';setupInit()}
+function closePlanConfirm(){$('planConfirmOv').style.display='none'}
+function openSettings(){fillSettings();$('settingsOv').style.display='flex'}
+function closeSettings(){$('settingsOv').style.display='none'}
+function fillSettings(){var set=ld('set',null);var us=gU();var ud=user?us[user]:null;
+$('setUser').textContent=user||'-';
+$('setUser2').textContent=user||'-';
+$('setEmail').textContent=(ud&&ud.email)?ud.email:'-';
+$('setEmail2').textContent=(ud&&ud.email)?ud.email:'-';
+$('setNick').textContent=user||'-';
+$('setNick2').textContent=user||'-';
+if(set){$('setTarget').textContent=set.target||'-';$('setExam').textContent=set.exam||'-';$('setCet').textContent=set.cet||'-'}
+else{$('setTarget').textContent='-';$('setExam').textContent='-';$('setCet').textContent='-'}
+$('setTarget2').textContent=$('setTarget').textContent;
+$('setExam2').textContent=$('setExam').textContent;
+$('setCet2').textContent=$('setCet').textContent;
+// 弹窗内的制定新计划按钮也跟随主题
+var p3=$('planBtn3');if(p3&&window._lastAccentDark)p3.style.color=window._lastAccentDark;}
+function editSetting(field){var val=prompt('请输入新的'+field+':','');if(val===null)return;val=val.trim();if(!val){alert('不能为空！');return}
+var set=ld('set',null);var us=gU();var ud=user?us[user]:null;
+if(field==='用户名'){if(us[val]){alert('用户名已存在！');return}var ud2=ud;delete us[user];us[val]=ud2;sU(us);localStorage.removeItem('_cu');localStorage.setItem('_cu',val);user=val;fillSettings();upBar();alert('✅ 用户名已更新')}
+else if(field==='邮箱'){if(!/^\S+@\S+\.\S+$/.test(val)){alert('邮箱格式无效！');return}ud.email=val;us[user]=ud;sU(us);fillSettings();alert('✅ 邮箱已更新')}
+else if(field==='昵称'){if(!ud)ud={};ud.nick=val;us[user]=ud;sU(us);fillSettings();alert('✅ 昵称已更新')}
+else if(field==='密码'){if(val.length<6){alert('密码至少6位！');return}ud.pw=val;us[user]=ud;sU(us);alert('✅ 密码已更新')}
+else if(field==='目标总分'){if(set){set.target=parseFloat(val);sd('set',set)}fillSettings();alert('✅ 目标总分已更新')}
+else if(field==='考试日期'){if(set){set.exam=val;sd('set',set)}fillSettings();alert('✅ 考试日期已更新')}
+else if(field==='六级分数'){if(set){set.cet=parseInt(val);sd('set',set)}fillSettings();alert('✅ 六级分数已更新')}}
+function regeneratePlan(){if(confirm('重新生成将按当前设置重新计算计划，打卡记录会保留，确定？')){var set=ld('set',null);if(!set){alert('请先完成设置向导！');return}var plan=null;window._genTemp=set;genPlanFromSettings(set);alert('✅ 计划已重新生成！')}}
+function genPlanFromSettings(set){sd('pl',null);var start=new Date();start.setHours(0,0,0,0);var eDate=new Date(set.exam);var diff=Math.ceil((eDate-start)/86400000);if(diff<=0){alert('日期无效');return}var N=set.total||60,sch=set.sched||{};var dw=[];var tw=0;for(var d=0;d<diff;d++){var dt=new Date(start);dt.setDate(dt.getDate()+d);var en=DAYE[dt.getDay()],sc=sch[en]||'none';var w=0;if(sc==='full')w=4;else if(sc==='m_a')w=3.5;else if(sc==='a_e')w=3;else if(sc==='morning'||sc==='afternoon'||sc==='evening')w=2;else if(sc==='lite')w=1;else w=.3;dw.push({date:fmt(dt),weight:w,sched:sc});tw+=w}var ta=[];if(tw>0){var as=dw.map(function(d){return Math.floor(d.weight/tw*N)});var rm=N-as.reduce(function(a,b){return a+b},0);var idx=dw.map(function(d,i){return{i:i,w:d.weight}}).sort(function(a,b){return b.w-a.w});for(var i=0;i<rm&&i<idx.length;i++)as[idx[i].i]++;ta=as}else dw.forEach(function(){ta.push(0)});var tc=0;var days=[];for(var d=0;d<diff;d++){var _dw=dw[d],nt=ta[d]||0,tasks=[],date=_dw.date;for(var t=0;t<nt&&tc<N;t++){var l=TS[tc%TS.length];tasks.push({id:'t'+date+'_'+tc,l:'📝刷'+l+'第'+(tc+1)+'套',ex:20,co:8,sub:'L'});tc++;tasks.push({id:'la'+date+'_'+t,l:'🔍精析听力错题',ex:10,co:4,sub:'L'});tasks.push({id:'ra'+date+'_'+t,l:'🔍精析阅读错题',ex:10,co:4,sub:'R'})}var isH=_dw.sched==='full'||_dw.sched==='m_a'||_dw.sched==='a_e',isL=_dw.sched==='morning'||_dw.sched==='afternoon'||_dw.sched==='evening';if(isH&&d%3===1)tasks.push({id:'w1'+date,l:'✍️小作文',ex:12,co:5,sub:'W'});if(isH&&d%3===2)tasks.push({id:'w2'+date,l:'✍️大作文',ex:15,co:6,sub:'W'});if((isH||isL)&&d%2===0)tasks.push({id:'sp'+date,l:'🎤口语练习',ex:12,co:5,sub:'S'});if(d%2===0)tasks.push({id:'vo'+date,l:'📖词汇背诵',ex:8,co:3,sub:'L'});if(d%4===0)tasks.push({id:'rv'+date,l:'📓错题本复习',ex:8,co:3,sub:'R'});if(!tasks.length)tasks.push({id:'li'+date,l:'📚复习笔记',ex:6,co:2,sub:'R'});days.push({date,tasks})}sd('pl',{d:days,total:N})}
+function resetAccount(){if(confirm('确定要重置账号数据吗？将清空所有打卡记录和进度！')){var keep={lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]};sStats(keep);sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('ck',{});sd('sc',[]);sd('bio','');sd('set',null);sd('pl',null);alert('✅ 账号已重置！');$('appScreen').style.display='none';$('setupScreen').style.display='flex';setupInit()}}
+function deleteAccount(){if(confirm('⚠️ 确定要永久删除账号吗？此操作不可恢复！')){if(!confirm('再次确认：删除后将无法找回任何数据！'))return;var us=gU();delete us[user];sU(us);localStorage.removeItem('_cu');Object.keys(localStorage).forEach(function(k){if(k.indexOf('u_'+user+'_')===0)localStorage.removeItem(k)});user=null;location.reload()}}
+// ===== 管理后台 =====
+function adminUsers(){var us=gU();return Object.keys(us).filter(function(k){return k!=='admin'})}
+function renderAdminUsers(){var us=gU();var names=adminUsers();var box=$('adminUsers');if(!names.length){box.innerHTML='<p style="color:#7a7a9e">暂无注册用户</p>';return}
+box.innerHTML='<div style="display:grid;gap:8px">'+names.map(function(n){
+  var d=us[n]||{};var st=ld('st',{lv:1,co:0});var email=d.email||'-';
+  return '<div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.7);border-radius:14px;flex-wrap:wrap">'
+   +'<span style="font-weight:700">👤 '+n+'</span>'
+   +'<span style="font-size:.75rem;color:#7a7a9e">📧 '+email+'</span>'
+   +'<span style="font-size:.75rem;color:#7a7a9e">Lv.'+st.lv+' · 🪙'+Math.max(0,st.co)+'</span>'
+   +'<span style="font-size:.75rem;color:#7a7a9e">✔ '+((st.tk||0))+'任务</span>'
+   +'<span style="margin-left:auto;display:flex;gap:6px">'
+   +'<button class="btn btn-sm" style="background:rgba(161,140,209,.15);color:#a18cd1;padding:3px 10px;font-size:.7rem" onclick="adminGiveCoins(\''+n+'\')">🪙 加金币</button>'
+   +'<button class="btn btn-sm" style="background:rgba(132,250,176,.3);color:#2d8f5c;padding:3px 10px;font-size:.7rem" onclick="adminResetUser(\''+n+'\')">🔄 重置</button>'
+   +'<button class="btn btn-sm" style="background:rgba(255,107,107,.2);color:#e74c3c;padding:3px 10px;font-size:.7rem" onclick="adminDeleteUser(\''+n+'\')">🗑️ 删除</button>'
+   +'</span></div>'}).join('')+'</div>'}
+function adminGiveCoins(n){var amt=prompt('给 '+n+' 加多少金币？','500');if(amt===null)return;amt=parseInt(amt);if(isNaN(amt))return;var o=user;user=n;var st=stats();st.co+=amt;sStats(st);user=o;alert('✅ 已给 '+n+' 加 '+amt+' 金币');renderAdminUsers()}
+function adminResetUser(n){if(!confirm('重置 '+n+' 的数据？'))return;var o=user;user=n;sd('st',{lv:1,ex:0,co:200,hp:100,sk:0,tk:0,ts:0,pf:0,sb:{L:0,R:0,W:0,S:0},ah:[]});sd('si',{p:'c',ps:['c'],ac:{},acs:[],bg:'b0',bgs:['bg0']});sd('ck',{});sd('sc',[]);sd('bio','');sd('set',null);sd('pl',null);user=o;alert('✅ 已重置 '+n);renderAdminUsers()}
+function adminDeleteUser(n){if(!confirm('删除账号 '+n+'？此操作不可恢复！'))return;var us=gU();delete us[n];sU(us);Object.keys(localStorage).forEach(function(k){if(k.indexOf('u_'+n+'_')===0)localStorage.removeItem(k)});alert('🗑️ 已删除 '+n);renderAdminUsers()}
+function showAdminNav(){var b=$('adminNavBtn');if(b)b.style.display=isAdmin()?'':'none'}
+// 管理员无限金币：显示99999+
+function adminCoins(){if(isAdmin())return 99999;var s=stats();return Math.max(0,s.co)}
+function adminExp(){if(isAdmin())return 999999;var s=stats();return Math.max(0,s.ex)}
+// ===== 通知（下拉菜单） =====
+var _notifyTimer=null;
+function toggleNotifyDrop(){hideDrop();var el=$('notifyDrop');if(el.style.display==='block'){el.style.display='none'}else{$('notifyListDrop').innerHTML=buildNotify();$('notifyDot').style.display='none';el.style.display='block'}}
+function hideNotifyDrop(){var el=$('notifyDrop');if(el)el.style.display='none'}
+function buildNotify(){var items=[];var s=stats();if((s.ah||[]).length>0)items.push('🏆 恭喜解锁 '+s.ah.length+' 个成就！');var set=ld('set',null);if(set){var d=Math.ceil((new Date(set.exam)-new Date())/86400000);if(d>0)items.push('⏳ 距离雅思考试还有 '+d+' 天');if(d===0)items.push('📢 今天就是考试日！加油！')}var rec=ld('sc',[]);if(rec.length)items.push('📊 你已上传 '+rec.length+' 次成绩');if(items.length===0)items.push('✨ 暂无新通知');return items.map(function(t){return '<div style="padding:10px;background:rgba(255,255,255,.6);border-radius:12px;margin-bottom:6px;font-size:.85rem">'+t+'</div>'}).join('')}
+// ===== 数据同步 =====
+function doSync(){var n=new Date();localStorage.setItem('_last_sync_'+user,n.getTime());renderNotifyDot();upBar();upAvatar();upTasks();upDash();upAch();showSyncToast()}
+var _syncToast=null;
+function showSyncToast(){if(_syncToast){_syncToast.remove()}_syncToast=document.createElement('div');_syncToast.style.cssText='position:fixed;top:60px;left:50%;transform:translateX(-50%);background:rgba(61,61,92,.9);color:#fff;padding:8px 20px;border-radius:50px;font-size:.8rem;z-index:99999;font-family:"Baloo 2",cursive;box-shadow:0 4px 15px rgba(0,0,0,.15);animation:pop .3s ease';_syncToast.textContent='✅ 已保存并刷新';document.body.appendChild(_syncToast);setTimeout(function(){if(_syncToast){_syncToast.remove();_syncToast=null}},1500)}
+function renderNotifyDot(){var s=stats();var hasNew=(s.ah||[]).length>0;var dot=$('notifyDot');if(dot)dot.style.display=hasNew?'block':'none'}
+function exportData(){var all={stats:ld('st',null),sisi:ld('si',null),settings:ld('set',null),plan:ld('pl',null),checkins:ld('ck',null),scores:ld('sc',null),bio:ld('bio','')};var blob=new Blob([JSON.stringify(all)],{type:'application/json'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='ielts_'+user+'_backup.json';a.click();alert('✅ 数据已导出！')}
+function importData(){$('importFile').click()}
+function doImport(input){var f=input.files[0];if(!f)return;var reader=new FileReader();reader.onload=function(e){try{var data=JSON.parse(e.target.result);if(!data.stats){alert('⚠️ 无效的备份文件！');return}sd('st',data.stats||null);sd('si',data.sisi||null);sd('set',data.settings||null);sd('pl',data.plan||null);sd('ck',data.checkins||null);sd('sc',data.scores||null);sd('bio',data.bio||'');alert('✅ 数据导入成功！');refresh()}catch(err){alert('⚠️ 导入失败：文件格式错误')}};reader.readAsText(f)}
+// ===== 编辑头像 =====
+function openAvatarEditor(){var si=getSisi();var list=$('avatarPetList');list.innerHTML=(si.ps||['c']).map(function(id){var p=PETS.find(function(p){return p.id===id});if(!p)return '';return '<div onclick="setAvatarPet(\''+p.id+'\')" style="text-align:center;padding:8px;border-radius:14px;border:2px solid '+(p.id===si.p?'#a18cd1':'transparent')+';background:'+(p.id===si.p?'rgba(161,140,209,.15)':'rgba(255,255,255,.7)')+';cursor:pointer;min-width:60px"><span style="font-size:2rem;display:block">'+p.e+'</span><span style="font-size:.6rem;font-weight:600">'+p.n+'</span></div>'}).join('');var accList=$('avatarAccList');accList.innerHTML=ACCS.map(function(a){var owned=(si.acs||[]).indexOf(a.id)>=0;var eq=si.ac&&si.ac[a.sl]===a.id;return '<div onclick="toggleAcc(\''+a.id+'\')" style="text-align:center;padding:8px;border-radius:14px;border:2px solid '+(eq?'#a18cd1':'transparent')+';background:'+(eq?'rgba(161,140,209,.15)':'rgba(255,255,255,.7)')+';cursor:pointer;min-width:56px;'+(owned?'':'opacity:.4')+'"><span style="font-size:1.5rem;display:block">'+a.e+'</span><span style="font-size:.6rem">'+a.n+'</span></div>'}).join('');$('avatarOv').style.display='flex'}
+function setAvatarPet(id){var si=getSisi();si.p=id;setSisi(si);upBar();upAvatar();openAvatarEditor()}
+function toggleAcc(id){var si=getSisi(),a=ACCS.find(function(x){return x.id===id});if(!a)return;if((si.acs||[]).indexOf(id)<0){alert('尚未拥有此装扮，请到商店购买！');return}if(!si.ac)si.ac={};if(si.ac[a.sl]===a.id){delete si.ac[a.sl]}else{si.ac[a.sl]=id}setSisi(si);upAvatar();openAvatarEditor()}
+function closeAvatarEditor(){$('avatarOv').style.display='none';upAvatar()}
+// ===== 简介 =====
+function openBio(){var bio=ld('bio','');$('bioInput').value=bio||'';$('bioOv').style.display='flex'}
+function saveBio(){sd('bio',$('bioInput').value.trim());alert('✅ 简介已保存！');closeBio()}
+function closeBio(){$('bioOv').style.display='none'}
+
+// ===== 启动 =====
+document.addEventListener('dragover',function(e){e.preventDefault()});document.addEventListener('drop',function(e){e.preventDefault()});
+// 点击其他地方关闭下拉菜单
+document.addEventListener('click',function(e){
+  var ud=$('userDrop');if(ud&&ud.style.display==='block'&&!e.target.closest('#userDrop')&&!e.target.closest('[onclick="toggleDrop()"]')){ud.style.display='none'}
+  var nd=$('notifyDrop');if(nd&&nd.style.display==='block'&&!e.target.closest('#notifyDrop')&&!e.target.closest('[onclick="toggleNotifyDrop()"]')){nd.style.display='none'}
+});
+(function init(){var cu=localStorage.getItem('_cu');if(cu){var us=gU();if(us[cu]){user=cu;enterApp()}}})();
+</script>
+</body></html>

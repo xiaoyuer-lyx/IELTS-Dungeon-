@@ -1,0 +1,14 @@
+# 依赖
+node_modules/
+
+# 环境变量(含密钥,绝不上传)
+.env
+backend/.env
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+
+# Render 本地 CLI 产物
+docker/
+.cache/
