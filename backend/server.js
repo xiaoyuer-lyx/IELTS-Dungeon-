@@ -326,10 +326,20 @@ app.delete('/api/admin/users/:name', adminAuth, async (req, res) => {
 const path = require('path');
 // Render 部署时，前端 index.html 在项目根目录
 const frontendDir = path.join(__dirname, '..');
-app.use(express.static(frontendDir));
+// 强制不缓存前端页面，避免浏览器一直加载旧代码
+app.use(express.static(frontendDir, {
+  setHeaders(res) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+  }
+}));
 
 // 根路径 -> 打开前端主页
 app.get('/', (req, res) => {
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   res.sendFile(path.join(frontendDir, 'ielts_egg_party.html'));
 });
 
