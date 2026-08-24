@@ -464,14 +464,14 @@ fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'}
   if(!res.ok){$('regErr').textContent=res.error||'注册失败！';$('regErr').style.color='#e74c3c';return}
   $('loginU').value=u;$('loginP').value='';$('loginErr').textContent='✅ 注册成功，请登录！';$('loginErr').style.color='#84fab0';showAuth('login')
 }).catch(function(){$('regErr').textContent='网络错误，请稍后再试';$('regErr').style.color='#e74c3c'})}
-function logout(){if(window._saveTimer){clearTimeout(window._saveTimer);saveNow()}user=null;window._token=null;localStorage.removeItem('_cu');localStorage.removeItem('_tk');$('appScreen').style.display='none';$('authScreen').style.display='flex'}
+function logout(){if(window._saveTimer){clearTimeout(window._saveTimer);saveNow()}user=null;window._token=null;localStorage.removeItem('_cu');localStorage.removeItem('_tk');document.querySelectorAll('.page').forEach(function(e){e.classList.add('hide');e.classList.remove('show')});$('appScreen').style.display='none';$('authScreen').style.display='flex'}
 function sisiMsg(){myAlert(['思思说加油！','冲冲冲！','思思相信你！'][Math.floor(Math.random()*3)])}
 var _dropTimer=null;
 function toggleDrop(){hideNotifyDrop();var el=$('userDrop');if(el.style.display==='block'){el.style.display='none'}else{el.style.display='block'}}
 function hideDrop(){var el=$('userDrop');if(el)el.style.display='none'}
 
 // ===== 入口 =====
-function enterApp(){$('authScreen').style.display='none';if(isAdmin()){$('appScreen').style.display='flex';refresh();goPage('admin');return}var s=ld('set',null);if(!s){$('setupScreen').style.display='flex';setupInit();return}var p=ld('pl',null);if(!p||!p.d||!p.d.length){$('setupScreen').style.display='flex';setupInit();return}$('appScreen').style.display='flex';refresh()}
+function enterApp(){$('authScreen').style.display='none';if(isAdmin()){$('appScreen').style.display='flex';refresh();goPage('admin');return}var s=ld('set',null);if(!s){$('setupScreen').style.display='flex';setupInit();return}var p=ld('pl',null);if(!p||!p.d||!p.d.length){$('setupScreen').style.display='flex';setupInit();return}$('appScreen').style.display='flex';goPage('tasks',document.querySelectorAll('.topnav button')[0]);refresh()}
 // 本地今天的 YYYY-MM-DD（字符串比较即时间比较，无时区偏移）
 function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
 function setupInit(){sStep=0;wOff=0;$('sgen').classList.add('hidden');$('snext').classList.remove('hidden');window._wkO=['listening','reading','writing','speaking'];renderWeak();renderSched();sShow(0);
