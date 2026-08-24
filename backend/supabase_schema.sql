@@ -8,11 +8,19 @@ CREATE TABLE IF NOT EXISTS public.users (
   id SERIAL PRIMARY KEY,
   username TEXT UNIQUE NOT NULL,
   password TEXT NOT NULL,          -- bcrypt hash
-  email TEXT,
+  email TEXT UNIQUE,               -- 一个邮箱只能注册一个账号
   nickname TEXT,
   data JSONB DEFAULT '{}',         -- 用户全部游戏数据
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- 若表已存在（首次建表可跳过此步），在 Supabase SQL Editor 手动执行：
+--   1) 先清理历史重复邮箱（保留其一，其余改名，避免 UNIQUE 约束建立失败）
+--      UPDATE public.users a SET email = a.email || '_dup_' || a.id
+--      FROM public.users b
+--      WHERE a.id > b.id AND a.email = b.email;
+--   2) 给 email 加唯一约束
+--      ALTER TABLE public.users ADD CONSTRAINT users_email_key UNIQUE (email);
 
 -- 开启 RLS（行级安全）：生产环境建议配合 Supabase Auth
 -- 但我们用 JWT 自定义认证，先禁用 RLS 让服务端可访问

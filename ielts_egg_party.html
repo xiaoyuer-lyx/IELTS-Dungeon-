@@ -89,7 +89,7 @@ h1,h2,h3{font-family:'Baloo 2','Quicksand',cursive}
   <div style="width:100%;max-width:600px;background:rgba(255,255,255,.25);backdrop-filter:blur(20px);border-radius:40px;padding:32px;margin:20px auto">
     <h2 style="text-align:center;margin-bottom:24px;">📋 副本设置向导</h2>
     <div id="step0"><h3>📅 考试信息</h3>
-      <div class="ig"><label>考试日期</label><input type="date" id="sExam" value="2026-06-14"></div>
+      <div class="ig"><label>考试日期</label><input type="date" id="sExam"></div>
       <div class="ig"><label>目标总分</label><input type="number" id="sTarget" value="7.0" min="5.5" max="9" step="0.5" placeholder="5.5~9.0"></div>
       <div class="ig"><label>六级分数</label><input type="number" id="sCet" placeholder="如 539" value="539"></div>
     </div>
@@ -408,7 +408,7 @@ fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},bo
   enterApp();
 }).catch(function(){$('loginErr').textContent='网络错误，请稍后再试';$('loginErr').style.color='#e74c3c'})}
 function isAdmin(){return user==='admin'}
-function handleRegister(){var e=$('regE').value.trim(),u=$('regU').value.trim(),p=$('regP').value,c=$('regC').value;if(!e||!/^\S+@\S+\.\S+$/.test(e)){$('regErr').textContent='邮箱无效！';return}if(u.length<3){$('regErr').textContent='至少3字符！';return}if(p.length<6){$('regErr').textContent='至少6位！';return}if(p!==c){$('regErr').textContent='两次不一致！';return}
+function handleRegister(){var e=$('regE').value.trim().toLowerCase(),u=$('regU').value.trim(),p=$('regP').value,c=$('regC').value;if(!e||!/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/.test(e)){$('regErr').textContent='邮箱无效！';return}if(u.length<3){$('regErr').textContent='至少3字符！';return}if(p.length<6){$('regErr').textContent='至少6位！';return}if(p!==c){$('regErr').textContent='两次不一致！';return}
 $('regErr').textContent='注册中…';$('regErr').style.color='#7a7a9e';
 fetch('/api/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,email:e})})
 .then(function(r){return r.json()})
@@ -424,7 +424,11 @@ function hideDrop(){var el=$('userDrop');if(el)el.style.display='none'}
 
 // ===== 入口 =====
 function enterApp(){$('authScreen').style.display='none';if(isAdmin()){$('appScreen').style.display='flex';refresh();goPage('admin');return}var s=ld('set',null);if(!s){$('setupScreen').style.display='flex';setupInit();return}var p=ld('pl',null);if(!p||!p.d||!p.d.length){$('setupScreen').style.display='flex';setupInit();return}$('appScreen').style.display='flex';refresh()}
-function setupInit(){sStep=0;wOff=0;$('sgen').classList.add('hidden');$('snext').classList.remove('hidden');window._wkO=['listening','reading','writing','speaking'];renderWeak();renderSched();sShow(0)}
+// 本地今天的 YYYY-MM-DD（字符串比较即时间比较，无时区偏移）
+function todayStr(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function setupInit(){sStep=0;wOff=0;$('sgen').classList.add('hidden');$('snext').classList.remove('hidden');window._wkO=['listening','reading','writing','speaking'];renderWeak();renderSched();sShow(0);
+// 考试日期默认今天，且不允许选早于今天的日期
+var t=todayStr();$('sExam').value=t;$('sExam').min=t}
 function renderWeak(){var c=$('weakList');c.innerHTML='';if(!window._wkO||!window._wkO.length)window._wkO=['listening','reading','writing','speaking'];window._wkDrag=null;var lb={listening:'👂听力',reading:'📖阅读',writing:'✍️写作',speaking:'🎤口语'};window._wkO.forEach(function(k,i){
 var d=document.createElement('div');d.draggable=true;d.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 14px;background:rgba(255,255,255,.5);border-radius:14px;margin-bottom:6px;cursor:grab;user-select:none;';
 d.addEventListener('dragstart',function(e){window._wkDrag=i;e.dataTransfer.effectAllowed='move';setTimeout(function(){d.style.opacity='.4'},0)});
@@ -437,7 +441,7 @@ function renderSched(){var sc=$('schedC');sc.innerHTML='';DAYE.forEach(function(
 function tD(en){var r=document.querySelector('[data-day="'+en+'"]');if(!r)return;var cb=r.querySelector('input'),sel=r.querySelector('select');sel.disabled=!cb.checked;sel.style.opacity=cb.checked?'1':'.4'}
 function sShow(s){var steps=['step0','step1','step2','step3','step4'];steps.forEach(function(id,i){$(id).style.display=i===s?'block':'none'});$('sNum').textContent=(s+1)+'/5';$('sprev').style.visibility=s===0?'hidden':'visible';if(s===4){$('snext').classList.add('hidden');$('sgen').classList.remove('hidden')}else{$('snext').classList.remove('hidden');$('sgen').classList.add('hidden')}}
 function sPrev(){if(sStep>0){sStep--;sShow(sStep)}}
-function sNext(){if(sStep===0&&!$('sExam').value){alert('请选日期');return}if(sStep<4){sStep++;sShow(sStep)}}
+function sNext(){if(sStep===0){var ex=$('sExam').value;if(!ex){alert('请选择考试日期');return}if(ex<todayStr()){alert('考试日期不能早于今天');return}}if(sStep<4){sStep++;sShow(sStep)}}
 
 // ===== 计划生成 =====
 function genPlan(){var set={exam:$('sExam').value,target:parseFloat($('sTarget').value)||7,cet:parseInt($('sCet').value)||539,total:parseInt($('sTests').value)||60,weak:window._wkO,sched:{}};document.querySelectorAll('#schedC > div').forEach(function(r){var cb=r.querySelector('input');set.sched[r.dataset.day]=cb.checked?r.querySelector('select').value:'none'});sd('set',set);
@@ -607,7 +611,7 @@ else if(field==='昵称'){if(val.length>20){alert('昵称最多20字符');return
 else if(field==='密码'){if(val.length<6){alert('密码至少6位！');return}
   fetch('/api/settings',{method:'PUT',headers:{'Content-Type':'application/json','Authorization':'Bearer '+(window._token||'')},body:JSON.stringify({password:val})}).then(function(r){return r.json()}).then(function(res){if(res.ok){alert('✅ 密码已更新')}else alert(res.error||'保存失败')})}
 else if(field==='目标总分'){if(set){set.target=parseFloat(val);sd('set',set)}fillSettings();alert('✅ 目标总分已更新')}
-else if(field==='考试日期'){if(set){set.exam=val;sd('set',set)}fillSettings();alert('✅ 考试日期已更新')}
+else if(field==='考试日期'){if(!/^\d{4}-\d{2}-\d{2}$/.test(val)){alert('日期格式需为 YYYY-MM-DD，如 '+todayStr());return}if(val<todayStr()){alert('考试日期不能早于今天！');return}if(set){set.exam=val;sd('set',set)}fillSettings();alert('✅ 考试日期已更新')}
 else if(field==='六级分数'){if(set){set.cet=parseInt(val);sd('set',set)}fillSettings();alert('✅ 六级分数已更新')}}
 function regeneratePlan(){if(confirm('重新生成将按当前设置重新计算计划，打卡记录会保留，确定？')){var set=ld('set',null);if(!set){alert('请先完成设置向导！');return}var plan=null;window._genTemp=set;genPlanFromSettings(set);alert('✅ 计划已重新生成！')}}
 function genPlanFromSettings(set){sd('pl',null);var start=new Date();start.setHours(0,0,0,0);var eDate=new Date(set.exam);var diff=Math.ceil((eDate-start)/86400000);if(diff<=0){alert('日期无效');return}var N=set.total||60,sch=set.sched||{};var dw=[];var tw=0;for(var d=0;d<diff;d++){var dt=new Date(start);dt.setDate(dt.getDate()+d);var en=DAYE[dt.getDay()],sc=sch[en]||'none';var w=0;if(sc==='full')w=4;else if(sc==='m_a')w=3.5;else if(sc==='a_e')w=3;else if(sc==='morning'||sc==='afternoon'||sc==='evening')w=2;else if(sc==='lite')w=1;else w=.3;dw.push({date:fmt(dt),weight:w,sched:sc});tw+=w}var ta=[];if(tw>0){var as=dw.map(function(d){return Math.floor(d.weight/tw*N)});var rm=N-as.reduce(function(a,b){return a+b},0);var idx=dw.map(function(d,i){return{i:i,w:d.weight}}).sort(function(a,b){return b.w-a.w});for(var i=0;i<rm&&i<idx.length;i++)as[idx[i].i]++;ta=as}else dw.forEach(function(){ta.push(0)});var tc=0;var days=[];for(var d=0;d<diff;d++){var _dw=dw[d],nt=ta[d]||0,tasks=[],date=_dw.date;for(var t=0;t<nt&&tc<N;t++){var l=TS[tc%TS.length];tasks.push({id:'t'+date+'_'+tc,l:'📝刷'+l+'第'+(tc+1)+'套',ex:20,co:8,sub:'L'});tc++;tasks.push({id:'la'+date+'_'+t,l:'🔍精析听力错题',ex:10,co:4,sub:'L'});tasks.push({id:'ra'+date+'_'+t,l:'🔍精析阅读错题',ex:10,co:4,sub:'R'})}var isH=_dw.sched==='full'||_dw.sched==='m_a'||_dw.sched==='a_e',isL=_dw.sched==='morning'||_dw.sched==='afternoon'||_dw.sched==='evening';if(isH&&d%3===1)tasks.push({id:'w1'+date,l:'✍️小作文',ex:12,co:5,sub:'W'});if(isH&&d%3===2)tasks.push({id:'w2'+date,l:'✍️大作文',ex:15,co:6,sub:'W'});if((isH||isL)&&d%2===0)tasks.push({id:'sp'+date,l:'🎤口语练习',ex:12,co:5,sub:'S'});if(d%2===0)tasks.push({id:'vo'+date,l:'📖词汇背诵',ex:8,co:3,sub:'L'});if(d%4===0)tasks.push({id:'rv'+date,l:'📓错题本复习',ex:8,co:3,sub:'R'});if(!tasks.length)tasks.push({id:'li'+date,l:'📚复习笔记',ex:6,co:2,sub:'R'});days.push({date,tasks})}sd('pl',{d:days,total:N})}
