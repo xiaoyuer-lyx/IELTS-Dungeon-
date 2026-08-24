@@ -77,15 +77,15 @@ h1,h2,h3{font-family:'Baloo 2','Quicksand',cursive}
     </div>
     <div id="formLogin">
       <div class="ig"><label>👤 用户名</label><input type="text" id="loginU" placeholder="输入用户名"></div>
-      <div class="ig"><label>🔒 密码</label><div class="pw"><input type="password" id="loginP" placeholder="输入密码"><button type="button" class="pw-eye" onclick="togglePw('loginP',this)" tabindex="-1" title="显示/隐藏密码">👁</button></div></div>
+      <div class="ig"><label>🔒 密码</label><div class="pw"><input type="password" id="loginP" placeholder="输入密码"><button type="button" class="pw-eye" onclick="togglePw('loginP',this)" tabindex="-1" title="显示密码"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
       <div class="err" id="loginErr"></div>
       <button class="btn btn-pri" style="width:100%;margin-top:8px" onclick="handleLogin()">🚀 登录</button>
     </div>
     <div id="formReg" style="display:none">
       <div class="ig"><label>📧 邮箱</label><input type="email" id="regE" placeholder="输入邮箱"></div>
       <div class="ig"><label>👤 用户名</label><input type="text" id="regU" placeholder="至少3个字符"></div>
-      <div class="ig"><label>🔒 密码</label><div class="pw"><input type="password" id="regP" placeholder="至少6个字符"><button type="button" class="pw-eye" onclick="togglePw('regP',this)" tabindex="-1" title="显示/隐藏密码">👁</button></div></div>
-      <div class="ig"><label>🔒 确认密码</label><div class="pw"><input type="password" id="regC" placeholder="再次输入"><button type="button" class="pw-eye" onclick="togglePw('regC',this)" tabindex="-1" title="显示/隐藏密码">👁</button></div></div>
+      <div class="ig"><label>🔒 密码</label><div class="pw"><input type="password" id="regP" placeholder="至少6个字符"><button type="button" class="pw-eye" onclick="togglePw('regP',this)" tabindex="-1" title="显示密码"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
+      <div class="ig"><label>🔒 确认密码</label><div class="pw"><input type="password" id="regC" placeholder="再次输入"><button type="button" class="pw-eye" onclick="togglePw('regC',this)" tabindex="-1" title="显示密码"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button></div></div>
       <div class="err" id="regErr"></div>
       <button class="btn btn-suc" style="width:100%;margin-top:8px" onclick="handleRegister()">🎉 注册</button>
     </div>
@@ -441,7 +441,9 @@ function myConfirm(msg,onOk,okText,cancelText,ico,onCancel){var ov=document.getE
 
 // ===== 认证 =====
 function showAuth(t){$('formLogin').style.display=t==='login'?'block':'none';$('formReg').style.display=t==='register'?'block':'none';$('tabLogin').style.background=t==='login'?'#fff':'transparent';$('tabReg').style.background=t==='register'?'#fff':'transparent';$('loginErr').textContent='';$('regErr').textContent=''}
-function togglePw(id,btn){var el=$(id);if(!el)return;var show=el.type==='password';el.type=show?'text':'password';if(btn)btn.textContent=show?'🙈':'👁'}
+var PW_EYE='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+var PW_EYE_OFF='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#a18cd1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+function togglePw(id,btn){var el=$(id);if(!el)return;var show=el.type==='password';el.type=show?'text':'password';if(btn){btn.innerHTML=show?PW_EYE_OFF:PW_EYE;btn.title=show?'隐藏密码':'显示密码'}}
 function handleLogin(){var u=$('loginU').value.trim(),p=$('loginP').value;if(!u||!p){$('loginErr').textContent='请填写完整！';return}
 $('loginErr').textContent='登录中…';$('loginErr').style.color='#7a7a9e';
 fetch('/api/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})})
@@ -611,7 +613,7 @@ else if(curShop==='bgs'){BGS.forEach(function(b){var o=ob.has(b.id);h+='<div cla
 h+='</div>';c.innerHTML=h||'<p style="color:#7a7a9e">暂无商品</p>'}
 function buyPet(id){var s=stats(),si=getSisi(),p=PETS.find(function(x){return x.id===id});if(!p)return;if(!isAdmin()){if((s.co||0)<500){myAlert('需要🪙500！');return}if(!si.ps)si.ps=['c'];if(si.ps.includes(id)){myAlert('已拥有！');return}myConfirm('确认购买「'+p.n+'」？\n🪙500',function(){var st=stats(),s2=getSisi();if((st.co||0)<500){myAlert('金币不足');return}if(!s2.ps)s2.ps=['c'];if(s2.ps.indexOf(id)>=0)return;s2.ps.push(id);s2.p=id;st.co-=500;sStats(st);setSisi(s2);renderShop();upBar();upAvatar();myAlert('🎉获得新宠物！')},'确认购买','取消',p.e)}else{if(!si.ps)si.ps=['c'];if(si.ps.indexOf(id)<0)si.ps.push(id);si.p=id;setSisi(si);renderShop();upBar();upAvatar();myAlert('👑 管理员免费获得新宠物！')}}
 function buyAcc(id){var s=stats(),si=getSisi(),a=ACCS.find(function(x){return x.id===id});if(!a)return;if(!isAdmin()){if((s.co||0)<a.c){myAlert('需要🪙'+a.c+'！');return}if(!si.acs)si.acs=[];if(si.acs.includes(id)){myAlert('已拥有！');return}myConfirm('确认购买「'+a.n+'」？\n🪙'+a.c,function(){var st=stats(),s2=getSisi();if((st.co||0)<a.c){myAlert('金币不足');return}if(!s2.acs)s2.acs=[];if(s2.acs.indexOf(id)>=0)return;s2.acs.push(id);if(!s2.ac)s2.ac={};s2.ac[a.sl]=id;st.co-=a.c;sStats(st);setSisi(s2);renderShop();upBar();upAvatar();myAlert('🎀已穿戴！')},'确认购买','取消',a.e)}else{if(!si.acs)si.acs=[];if(si.acs.indexOf(id)<0)si.acs.push(id);if(!si.ac)si.ac={};si.ac[a.sl]=id;setSisi(si);renderShop();upBar();upAvatar();myAlert('👑 管理员免费穿戴！')}}
-function buyBg(id){var s=stats(),si=getSisi(),b=BGS.find(function(x){return x.id===id});if(!b)return;var app=$('appScreen');if(app&&bgMap[id])app.style.background=bgMap[id];var owned=(si.bgs||[]).indexOf(id)>=0||id==='b0';
+function buyBg(id){var s=stats(),si=getSisi(),b=BGS.find(function(x){return x.id===id});if(!b)return;try{var app=$('appScreen');if(app&&bgMap[id])app.style.background=bgMap[id]}catch(e){}var owned=(si.bgs||[]).indexOf(id)>=0||id==='b0';
 if(owned){myConfirm('背景「'+b.n+'」\n已拥有，点击「使用」立即切换',function(){var s2=getSisi();s2.bg=id;setSisi(s2);renderShop();upBar();upAvatar()},'使用','取消','🎨',function(){upAvatar()});return}
 if(!isAdmin()){if((s.co||0)<b.c){upAvatar();myAlert('需要🪙'+b.c+'！');return}myConfirm('确认购买背景「'+b.n+'」？\n🪙'+b.c,function(){var st=stats(),s2=getSisi();if((st.co||0)<b.c){upAvatar();myAlert('金币不足');return}if(!s2.bgs)s2.bgs=['b0'];if(s2.bgs.indexOf(id)>=0){upAvatar();return}s2.bgs.push(id);s2.bg=id;st.co-=b.c;sStats(st);setSisi(s2);renderShop();upBar();upAvatar();myAlert('🎨已解锁背景！')},'确认购买','取消','🎨',function(){upAvatar()})}else{if(!si.bgs)si.bgs=['b0'];if(si.bgs.indexOf(id)<0)si.bgs.push(id);si.bg=id;setSisi(si);renderShop();upBar();upAvatar();myAlert('👑 管理员免费解锁背景！')}}
 function doGacha(){var s=stats();if(!isAdmin()){if((s.co||0)<200){myAlert('需要🪙200！');return}}myConfirm('确认消耗 🪙200 抽一次扭蛋？',function(){gachaRoll()},'抽一次','取消')}
