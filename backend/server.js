@@ -112,7 +112,7 @@ app.post('/api/register', async (req, res) => {
     // 初始数据
     const defaultData = {
       st: { lv: 1, ex: 0, co: 200, hp: 100, sk: 0, tk: 0, ts: 0, pf: 0, sb: { L: 0, R: 0, W: 0, S: 0 }, ah: [] },
-      si: { p: 'c', ps: ['c'], ac: {}, acs: [], bg: 'b0', bgs: ['bg0'] },
+      si: { p: 'c', ps: ['c'], ac: {}, acs: [], bg: 'b0', bgs: ['b0'], plv: {}, pdup: {} },
       set: null, pl: null, ck: {}, sc: [], bio: ''
     };
 
@@ -302,7 +302,7 @@ app.post('/api/admin/users/:name/reset', adminAuth, async (req, res) => {
   try {
     const defaultData = {
       st: { lv: 1, ex: 0, co: 200, hp: 100, sk: 0, tk: 0, ts: 0, pf: 0, sb: { L: 0, R: 0, W: 0, S: 0 }, ah: [] },
-      si: { p: 'c', ps: ['c'], ac: {}, acs: [], bg: 'b0', bgs: ['bg0'] },
+      si: { p: 'c', ps: ['c'], ac: {}, acs: [], bg: 'b0', bgs: ['b0'], plv: {}, pdup: {} },
       set: null, pl: null, ck: {}, sc: [], bio: ''
     };
     await supabase.from('users').update({ data: defaultData }).eq('username', req.params.name);
